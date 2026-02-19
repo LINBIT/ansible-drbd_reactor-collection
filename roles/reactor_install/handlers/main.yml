@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: MIT-0
+---
+# handlers file for reactor_install
+- name: Restart drbd-reactor
+  ansible.builtin.systemd_service:
+    name: drbd-reactor.service
+    daemon_reload: true
+    state: restarted
+    enabled: true
+
+- name: Enable and start drbd-reactor-reload
+  ansible.builtin.systemd_service:
+    name: drbd-reactor-reload.path
+    daemon_reload: true
+    state: started
+    enabled: true

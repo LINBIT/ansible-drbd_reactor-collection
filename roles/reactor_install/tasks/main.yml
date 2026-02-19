@@ -1,0 +1,49 @@
+# SPDX-License-Identifier: MIT-0
+---
+# tasks file for reactor_install
+- name: Load OS-specific variables
+  ansible.builtin.include_vars: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_distribution | lower }}.yml"
+        - "{{ ansible_os_family | lower }}.yml"
+      paths:
+        - "{{ role_path }}/vars"
+      skip: true
+
+- name: Check for DRBD
+  ansible.builtin.stat:
+    path: "{{ reactor_install_drbd_path }}"
+  register: reactor_install_drbd_check
+
+- name: Install DRBD
+  ansible.builtin.include_role:
+    name: linbit.drbd.drbd_install
+  when: not reactor_install_drbd_check.stat.exists
+
+- name: Install DRBD Reactor
+  ansible.builtin.package:
+    name: drbd-reactor
+    state: present
+  notify: Restart drbd-reactor
+
+- name: Start and enable DRBD Reactor
+  ansible.builtin.systemd_service:
+    name: drbd-reactor.service
+    state: started
+    enabled: true
+
+# https://github.com/LINBIT/drbd-reactor?tab=readme-ov-file#automatic-reload
+- name: Enable automatic reload for DRBD Reactor
+  ansible.builtin.copy:
+    src: "{{ drbd_reactor_examples_dir }}/{{ item }}"
+    dest: "/etc/systemd/system/{{ item }}"
+    mode: '644'
+    remote_src: true
+  with_items:
+    - 'drbd-reactor-reload.path'
+    - 'drbd-reactor-reload.service'
+  notify: Enable and start drbd-reactor-reload
+
+- name: Flush handlers for role - reactor_install
+  ansible.builtin.meta: flush_handlers
