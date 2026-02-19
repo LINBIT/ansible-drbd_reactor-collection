@@ -1,24 +1,30 @@
-Role Name
-=========
+ha_gateway
+==========
 
-A brief description of the role goes here.
+Configure DRBD Reactor HA gateway resources for NFS and iSCSI.
+
+> **Work in progress.** This role is an Ansible-driven alternative to using
+> [LINSTOR Gateway](https://github.com/LINBIT/linstor-gateway) directly.
+> LINSTOR Gateway is the recommended tool for managing HA NFS and iSCSI
+> resources — this role automates equivalent configuration via DRBD Reactor
+> promoter resources but is not feature-complete. **Use at your own risk.**
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+None.
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+See `defaults/main.yml`.
 
 Dependencies
 ------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+`linbit.drbd_reactor.reactor_install`, `linbit.linstor.linstor_gateway_install_common`
 
-Installing LINSTOR Gateway with the `linstor_gateway_install_common` role is an easy to to install all required software for creating HA resources with DRBD Reactor.
+Install LINSTOR Gateway first with the `linstor_gateway_install_common` role before using this role to create HA resources.
 
 ```yaml
 - name: Install Gateway
@@ -34,8 +40,6 @@ Installing LINSTOR Gateway with the `linstor_gateway_install_common` role is an 
 
 Example Playbook
 ----------------
-
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
 
 ```yaml
 - name: Deploy HA resources with DRBD Reactor
