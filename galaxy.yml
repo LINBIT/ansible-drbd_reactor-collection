@@ -16,7 +16,7 @@ tags:
 - drbd
 - drbdreactor
 - ha
-dependencies:
+# dependencies:
   # linbit.common: '*'  # uncomment when published to Ansible Galaxy
   # linbit.drbd: '*'    # uncomment when published to Ansible Galaxy
 repository: https://gitlab.at.linbit.com/ansible-collections/linbit.drbd_reactor
