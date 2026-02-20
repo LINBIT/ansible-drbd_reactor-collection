@@ -11,7 +11,9 @@ Installs DRBD Reactor and manages HA gateway resource definitions for NFS and iS
 
 ## Dependencies
 
-- `linbit.drbd` — DRBD kernel module installation (required by `reactor_install`)
-- `linbit.linstor` — LINSTOR Gateway components (required by `ha_gateway`)
-- `ansible.posix` — firewalld management
-- `community.general` — package management
+| Collection | Purpose |
+|---|---|
+| `linbit.drbd` | DRBD kernel module installation (required by `reactor_install`) |
+| `linbit.linstor` | LINSTOR Gateway components (required by `ha_gateway`) |
+| `ansible.posix` | firewalld management |
+| `community.general` | package management |
