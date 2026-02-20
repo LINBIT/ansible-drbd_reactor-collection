@@ -3,11 +3,10 @@ ha_gateway
 
 Configure DRBD Reactor HA gateway resources for NFS and iSCSI.
 
-> **Work in progress.** This role is an Ansible-driven alternative to using
-> [LINSTOR Gateway](https://github.com/LINBIT/linstor-gateway) directly.
-> LINSTOR Gateway is the recommended tool for managing HA NFS and iSCSI
-> resources — this role automates equivalent configuration via DRBD Reactor
-> promoter resources but is not feature-complete. **Use at your own risk.**
+> **Work in progress.**
+> This role is an Ansible-driven alternative to using [LINSTOR Gateway](https://github.com/LINBIT/linstor-gateway) directly.
+> LINSTOR Gateway is the recommended tool for managing HA NFS and iSCSI resources — this role automates equivalent configuration via DRBD Reactor promoter resources but is not feature-complete.
+> **Use at your own risk.**
 
 Requirements
 ------------
