@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT-0
+# SPDX-License-Identifier: MIT
 ---
 # Use LINSTOR's DfltRscGrp by default
 - name: Spawn a new resource for iscsi share

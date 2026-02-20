@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT-0
+# SPDX-License-Identifier: MIT
 ---
 # defaults file for reactor_install
 drbd_reactor_examples_dir: '/usr/share/doc/packages/drbd-reactor'
