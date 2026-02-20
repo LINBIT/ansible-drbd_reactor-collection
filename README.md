@@ -1,3 +1,17 @@
 # Ansible Collection - linbit.drbd_reactor
 
-Documentation for the collection.
+Installs DRBD Reactor and manages HA gateway resource definitions for NFS and iSCSI.
+
+## Roles
+
+| Role | Description |
+|---|---|
+| `reactor_install` | Install and enable DRBD Reactor with automatic config reloading |
+| `ha_gateway` | Create HA NFS/iSCSI DRBD Reactor promoter resources via LINSTOR |
+
+## Dependencies
+
+- `linbit.drbd` — DRBD kernel module installation (required by `reactor_install`)
+- `linbit.linstor` — LINSTOR Gateway components (required by `ha_gateway`)
+- `ansible.posix` — firewalld management
+- `community.general` — package management
