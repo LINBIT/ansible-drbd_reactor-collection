@@ -25,7 +25,7 @@
   ansible.builtin.package:
     name: drbd-reactor
     state: present
-  notify: Restart drbd-reactor
+  notify: restart_drbd_reactor
 
 - name: Start and enable DRBD Reactor
   ansible.builtin.systemd_service:
@@ -43,7 +43,7 @@
   with_items:
     - 'drbd-reactor-reload.path'
     - 'drbd-reactor-reload.service'
-  notify: Enable and start drbd-reactor-reload
+  notify: enable_drbd_reactor_reload
 
 - name: Flush handlers for role - reactor_install
   ansible.builtin.meta: flush_handlers
