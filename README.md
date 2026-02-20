@@ -7,7 +7,7 @@ DRBD Reactor is the daemon that monitors DRBD resources and drives HA services v
 
 | Role | Description |
 |---|---|
-| `reactor_install` | Install and enable DRBD Reactor with automatic config reloading |
+| `reactor_install` | Install and enable DRBD Reactor with automatic config reloading. Dynamically includes `linbit.drbd.drbd_install` if DRBD is not already present on the node. |
 
 ## Dependencies
 
