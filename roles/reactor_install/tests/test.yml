@@ -3,4 +3,4 @@
 - hosts: localhost
   remote_user: root
   roles:
-    - drbd_reactor
+    - reactor_install
