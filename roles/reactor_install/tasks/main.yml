@@ -14,12 +14,12 @@
 - name: Check for DRBD
   ansible.builtin.stat:
     path: "{{ reactor_install_drbd_path }}"
-  register: reactor_install_drbd_check
+  register: _drbd_check
 
 - name: Install DRBD
   ansible.builtin.include_role:
     name: linbit.drbd.drbd_install
-  when: not reactor_install_drbd_check.stat.exists
+  when: not _drbd_check.stat.exists
 
 - name: Install DRBD Reactor
   ansible.builtin.package:
