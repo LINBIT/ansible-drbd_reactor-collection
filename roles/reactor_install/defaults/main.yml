@@ -2,7 +2,7 @@
 ---
 # defaults file for reactor_install
 reactor_install_drbd_path: >-
-  {%- if ansible_os_family | lower == 'debian' -%}
+  {%- if ansible_facts['os_family'] | lower == 'debian' -%}
     /usr/sbin/drbdadm
   {%- else -%}
     /sbin/drbdadm
