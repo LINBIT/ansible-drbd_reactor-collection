@@ -38,7 +38,7 @@
   ansible.builtin.copy:
     src: "{{ drbd_reactor_examples_dir }}/{{ item }}"
     dest: "/etc/systemd/system/{{ item }}"
-    mode: '644'
+    mode: '0644'
     remote_src: true
   with_items:
     - 'drbd-reactor-reload.path'
