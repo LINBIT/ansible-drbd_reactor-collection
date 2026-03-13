@@ -16,7 +16,7 @@
     name: linbit.drbd.drbd_install
   when: reactor_install_drbd | bool
 
-- name: Install DRBD Reactor
+- name: Check for DRBD Reactor updates
   ansible.builtin.package:
     name: drbd-reactor
     state: "{{ reactor_install_package_state }}"
@@ -24,25 +24,5 @@
   notify: restart_drbd_reactor
 
 - name: Configure DRBD Reactor
+  ansible.builtin.include_tasks: configure-reactor.yml
   when: _reactor_install_packages is changed  # noqa: no-handler
-  block:
-    - name: Start and enable DRBD Reactor
-      ansible.builtin.systemd_service:
-        name: drbd-reactor.service
-        state: started
-        enabled: true
-
-    # https://github.com/LINBIT/drbd-reactor?tab=readme-ov-file#automatic-reload
-    - name: Enable automatic reload for DRBD Reactor
-      ansible.builtin.copy:
-        src: "{{ drbd_reactor_examples_dir }}/{{ item }}"
-        dest: "/etc/systemd/system/{{ item }}"
-        mode: '0644'
-        remote_src: true
-      with_items:
-        - 'drbd-reactor-reload.path'
-        - 'drbd-reactor-reload.service'
-      notify: enable_drbd_reactor_reload
-
-    - name: Flush handlers for role - reactor_install
-      ansible.builtin.meta: flush_handlers
