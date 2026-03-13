@@ -11,12 +11,14 @@ None.
 Role Variables
 --------------
 
-See `defaults/main.yml`.
+| Variable | Default | Description |
+|---|---|---|
+| `reactor_install_drbd` | `true` | Include `linbit.drbd.drbd_install` to install DRBD. Set to `false` when DRBD is already managed by a calling role (for example `satellite_install`). |
 
 Dependencies
 ------------
 
-`linbit.drbd.drbd_install`
+`linbit.drbd.drbd_install`: included by default, disable with `reactor_install_drbd: false`.
 
 Example Playbook
 ----------------

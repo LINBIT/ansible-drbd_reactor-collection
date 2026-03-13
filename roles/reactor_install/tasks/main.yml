@@ -11,15 +11,10 @@
         - "{{ role_path }}/vars"
       skip: true
 
-- name: Check for DRBD
-  ansible.builtin.stat:
-    path: "{{ reactor_install_drbd_path }}"
-  register: _drbd_check
-
 - name: Install DRBD
   ansible.builtin.include_role:
     name: linbit.drbd.drbd_install
-  when: not _drbd_check.stat.exists
+  when: reactor_install_drbd | bool
 
 - name: Install DRBD Reactor
   ansible.builtin.package:
