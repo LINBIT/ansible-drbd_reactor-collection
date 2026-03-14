@@ -1,0 +1,24 @@
+# SPDX-License-Identifier: MIT
+---
+argument_specs:
+  main:
+    short_description: Install and configure DRBD Reactor
+    description:
+      - Install and configure DRBD Reactor.
+      - Includes C(linbit.drbd.drbd_install) by default to install DRBD.
+    options:
+      reactor_install_drbd:
+        type: bool
+        default: true
+        description:
+          - Include C(linbit.drbd.drbd_install) to install DRBD.
+          - Set to C(false) when DRBD is already managed by a calling role.
+      reactor_install_package_state:
+        type: str
+        default: latest
+        choices:
+          - latest
+          - present
+        description:
+          - Package state for the DRBD Reactor package.
+          - Set C(present) to skip upgrades.
