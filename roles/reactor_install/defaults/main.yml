@@ -3,3 +3,4 @@
 # defaults file for reactor_install
 reactor_install_drbd: true
 reactor_install_package_state: latest
+reactor_install_resource_agents_github: true

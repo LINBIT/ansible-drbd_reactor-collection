@@ -1,0 +1,35 @@
+# SPDX-License-Identifier: MIT
+---
+# tasks file for resource_agents_fetch
+
+- name: Create OCF resource agent directory
+  ansible.builtin.file:
+    path: "{{ _ra_base }}"
+    state: directory
+    mode: "0755"
+
+- name: Download resource agents from GitHub
+  ansible.builtin.get_url:
+    url: >-
+      {{ _ra_github_raw_base }}/{{ _ra_version }}/heartbeat/{{ item }}{{ '.in'
+         if item in _ra_templates else '' }}
+    dest: "{{ _ra_base }}/{{ item }}"
+    mode: "0755"
+  loop: "{{ _ra_to_download }}"
+
+# For iSCSITarget and iSCSILogicalUnit only
+- name: Substitute @BASH_SHELL@ in template resource agents
+  ansible.builtin.replace:
+    path: "{{ _ra_base }}/{{ item }}"
+    regexp: '@BASH_SHELL@'
+    replace: /bin/bash
+  loop: "{{ _ra_to_download | intersect(_ra_templates) }}"
+
+- name: Add version marker to downloaded resource agents
+  ansible.builtin.lineinfile:
+    path: "{{ _ra_base }}/{{ item }}"
+    regexp: "^# {{ _ra_marker | regex_escape() }}"
+    insertafter: '^#!'
+    firstmatch: true
+    line: "# {{ _ra_marker }} {{ _ra_version }}"
+  loop: "{{ _ra_to_download }}"

@@ -22,3 +22,9 @@ argument_specs:
         description:
           - Package state for the DRBD Reactor package.
           - Set C(present) to skip upgrades.
+      reactor_install_resource_agents_github:
+        type: bool
+        default: true
+        description:
+          - Include C(linbit.drbd_reactor.resource_agents_fetch) to install missing OCF resource agents from GitHub.
+          - Useful on distributions where the C(resource-agents) package is missing or incomplete.

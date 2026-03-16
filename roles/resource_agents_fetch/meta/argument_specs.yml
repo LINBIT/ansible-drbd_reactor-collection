@@ -1,0 +1,31 @@
+# SPDX-License-Identifier: MIT
+---
+argument_specs:
+  main:
+    short_description: Install OCF resource agents from GitHub
+    description:
+      - Download missing OCF resource agents from the ClusterLabs GitHub repository.
+      - Only agents not already present on the system are downloaded.
+    options:
+      resource_agents_version:
+        type: str
+        default: v4.16.0
+        description:
+          - GitHub release tag to download (for example C(v4.17.0)).
+          - Empty string fetches the latest release.
+      resource_agents_list:
+        type: list
+        elements: str
+        default:
+          - portblock
+          - Filesystem
+          - IPaddr2
+          - iSCSITarget
+          - iSCSILogicalUnit
+          - nfsserver
+          - exportfs
+          - nvmet-subsystem
+          - nvmet-namespace
+          - nvmet-port
+        description:
+          - List of OCF resource agent names to ensure are present.

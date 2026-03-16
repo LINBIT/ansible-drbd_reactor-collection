@@ -1,0 +1,25 @@
+# SPDX-License-Identifier: MIT
+---
+# vars file for resource_agents_fetch
+
+# OCF resource agent base path (SUSE uses /usr/lib, others use /lib)
+_ra_base: >-
+  {{ '/usr/lib/ocf/resource.d/heartbeat'
+     if ansible_facts['os_family'] | lower == 'suse'
+     else '/lib/ocf/resource.d/heartbeat' }}
+
+_ra_github_repo: ClusterLabs/resource-agents
+_ra_github_raw_base: "https://raw.githubusercontent.com/{{ _ra_github_repo }}"
+_ra_github_api: "https://api.github.com/repos/{{ _ra_github_repo }}/releases/latest"
+_ra_marker: Managed by linbit.drbd_reactor.resource_agents_fetch
+
+_ra_version: >-
+  {{ resource_agents_version
+     if resource_agents_version | length > 0
+     else (lookup('ansible.builtin.url', _ra_github_api, split_lines=false)
+           | from_json).tag_name }}
+
+# RAs that exist as .in autoconf templates on GitHub (need @BASH_SHELL@ substitution)
+_ra_templates:
+  - iSCSITarget
+  - iSCSILogicalUnit

@@ -1,0 +1,19 @@
+# SPDX-License-Identifier: MIT
+---
+# defaults file for resource_agents_fetch
+
+# GitHub release tag (empty string fetches latest)
+resource_agents_version: v4.16.0
+
+# List of OCF resource agents to ensure are present
+resource_agents_list:
+  - portblock
+  - Filesystem
+  - IPaddr2
+  - iSCSITarget
+  - iSCSILogicalUnit
+  - nfsserver
+  - exportfs
+  - nvmet-subsystem
+  - nvmet-namespace
+  - nvmet-port

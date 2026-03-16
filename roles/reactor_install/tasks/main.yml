@@ -23,6 +23,11 @@
   register: _reactor_install_packages
   notify: restart_drbd_reactor
 
+- name: Install OCF resource agents from GitHub
+  ansible.builtin.include_role:
+    name: linbit.drbd_reactor.resource_agents_fetch
+  when: reactor_install_resource_agents_github | bool
+
 - name: Configure DRBD Reactor
   ansible.builtin.include_tasks: configure-reactor.yml
   when: _reactor_install_packages is changed  # noqa: no-handler
