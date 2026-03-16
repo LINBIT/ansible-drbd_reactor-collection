@@ -23,3 +23,42 @@ _ra_version: >-
 _ra_templates:
   - iSCSITarget
   - iSCSILogicalUnit
+
+# OCF shell library installed to {{ _ra_lib_base }}
+_ra_lib_base: "{{ _ra_base | dirname | dirname }}/lib/heartbeat"
+
+# Library files that are .in templates on GitHub
+_ra_lib_templates:
+  - ocf-shellfuncs
+  - ocf-binaries
+  - ocf-directories
+
+# Library files that are plain (no .in suffix)
+_ra_lib_plain:
+  - ocf-returncodes
+  - ocf-rarun
+  - ocf-distro
+  - findif.sh
+  - nfsserver-redhat.sh
+
+# Autoconf substitutions for OCF library .in templates
+_ra_lib_substitutions:
+  '@OCF_ROOT_DIR@': /usr/lib/ocf
+  '@sbindir@': /usr/sbin
+  '@SHELL@': /bin/sh
+  '@AWK@': awk
+  '@EGREP@': grep -E
+  '@IFCONFIG_A_OPT@': -a
+  '@MAILCMD@': mailx
+  '@PING@': ping
+  '@SSH@': /usr/bin/ssh
+  '@TEST@': test
+  '@prefix@': /usr
+  '@exec_prefix@': /usr
+  '@datadir@': /usr/share
+  '@sysconfdir@': /etc
+  '@localstatedir@': /var
+  '@libexecdir@': /usr/libexec
+  '@INITDIR@': /etc/init.d
+  '@HA_RSCTMPDIR@': /run/resource-agents
+  '@HA_VARRUNDIR@': /run

@@ -33,3 +33,60 @@
     firstmatch: true
     line: "# {{ _ra_marker }} {{ _ra_version }}"
   loop: "{{ _ra_to_download }}"
+
+# --- OCF shell library (ocf-shellfuncs and dependencies) ---
+
+- name: Create OCF shell library directory
+  ansible.builtin.file:
+    path: "{{ _ra_lib_base }}"
+    state: directory
+    mode: "0755"
+  when: _ra_lib_needs_download | bool
+
+- name: Create resource agents runtime directory
+  ansible.builtin.file:
+    path: /run/resource-agents
+    state: directory
+    mode: "0755"
+  when: _ra_lib_needs_download | bool
+
+- name: Persist resource agents runtime directory across reboots
+  ansible.builtin.copy:
+    content: "d /run/resource-agents 0755 root root -\n"
+    dest: /etc/tmpfiles.d/resource-agents.conf
+    mode: "0644"
+  when: _ra_lib_needs_download | bool
+
+- name: Download OCF shell library template files from GitHub
+  ansible.builtin.get_url:
+    url: "{{ _ra_github_raw_base }}/{{ _ra_version }}/heartbeat/{{ item }}.in"
+    dest: "{{ _ra_lib_base }}/{{ item }}"
+    mode: "0644"
+  loop: "{{ _ra_lib_templates }}"
+  when: _ra_lib_needs_download | bool
+
+- name: Download OCF shell library plain files from GitHub
+  ansible.builtin.get_url:
+    url: "{{ _ra_github_raw_base }}/{{ _ra_version }}/heartbeat/{{ item }}"
+    dest: "{{ _ra_lib_base }}/{{ item }}"
+    mode: "0644"
+  loop: "{{ _ra_lib_plain }}"
+  when: _ra_lib_needs_download | bool
+
+- name: Apply autoconf substitutions to OCF shell library templates
+  ansible.builtin.replace:
+    path: "{{ _ra_lib_base }}/{{ item.0 }}"
+    regexp: "{{ item.1.key | regex_escape() }}"
+    replace: "{{ item.1.value }}"
+  loop: "{{ _ra_lib_templates | product(_ra_lib_substitutions | dict2items) | list }}"
+  loop_control:
+    label: "{{ item.0 }}:{{ item.1.key }}"
+  when: _ra_lib_needs_download | bool
+
+- name: Add version marker to OCF shell library
+  ansible.builtin.lineinfile:
+    path: "{{ _ra_lib_base }}/ocf-shellfuncs"
+    regexp: "^# {{ _ra_marker | regex_escape() }}"
+    insertbefore: BOF
+    line: "# {{ _ra_marker }} {{ _ra_version }}"
+  when: _ra_lib_needs_download | bool

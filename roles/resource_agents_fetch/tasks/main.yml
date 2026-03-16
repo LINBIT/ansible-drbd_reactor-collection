@@ -24,6 +24,19 @@
            | rejectattr('stdout', 'search', _ra_version)
            | map(attribute='item') | list }}
 
+- name: Check OCF shell library version marker
+  ansible.builtin.command:
+    cmd: "grep -m1 '{{ _ra_marker }}' {{ _ra_lib_base }}/ocf-shellfuncs"
+  register: _ra_lib_check
+  changed_when: false
+  failed_when: false
+
+- name: Set OCF shell library download flag
+  ansible.builtin.set_fact:
+    _ra_lib_needs_download: >-
+      {{ _ra_lib_check.rc == 2
+         or (_ra_lib_check.rc == 0 and _ra_version not in _ra_lib_check.stdout) }}
+
 - name: Fetch missing OCF resource agents from GitHub
   ansible.builtin.include_tasks: fetch-agents.yml
-  when: _ra_to_download | length > 0
+  when: _ra_to_download | length > 0 or _ra_lib_needs_download | bool
