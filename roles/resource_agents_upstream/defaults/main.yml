@@ -1,12 +1,12 @@
 # SPDX-License-Identifier: MIT
 ---
-# defaults file for resource_agents_fetch
+# defaults file for resource_agents_upstream
 
 # GitHub release tag (empty string fetches latest)
-resource_agents_version: v4.16.0
+resource_agents_upstream_version: v4.16.0
 
 # List of OCF resource agents to ensure are present
-resource_agents_list:
+resource_agents_upstream_list:
   - portblock
   - Filesystem
   - IPaddr2

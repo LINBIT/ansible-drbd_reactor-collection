@@ -1,11 +1,11 @@
 # SPDX-License-Identifier: MIT
 ---
-# tasks file for resource_agents_fetch
+# tasks file for resource_agents_upstream
 
 - name: Check resource agent version markers
   ansible.builtin.command:
     cmd: "grep -m1 '{{ _ra_marker }}' {{ _ra_base }}/{{ item }}"
-  loop: "{{ resource_agents_list }}"
+  loop: "{{ resource_agents_upstream_list }}"
   register: _ra_check
   changed_when: false
   failed_when: false
@@ -40,3 +40,38 @@
 - name: Fetch missing OCF resource agents from GitHub
   ansible.builtin.include_tasks: fetch-agents.yml
   when: _ra_to_download | length > 0 or _ra_lib_needs_download | bool
+
+# --- C helper binaries (send_arp, tickle_tcp) ---
+
+# rc=0: our binary (stamp found) — check version
+# rc=1: system binary (exists, no stamp) — leave alone
+# rc=2: binary missing — needs compile
+- name: Check C helper binary version stamps
+  ansible.builtin.shell:
+    cmd: |
+      if [ -f "{{ _ra_bin_dir }}/.{{ item }}.version" ]; then
+        cat "{{ _ra_bin_dir }}/.{{ item }}.version"
+      elif [ -f "{{ _ra_bin_dir }}/{{ item }}" ]; then
+        exit 1
+      else
+        exit 2
+      fi
+  loop: "{{ _ra_helpers }}"
+  register: _ra_helper_check
+  changed_when: false
+  failed_when: false
+
+- name: Build list of C helpers to compile
+  ansible.builtin.set_fact:
+    _ra_helpers_to_compile: >-
+      {{ _ra_helper_check.results
+         | selectattr('rc', 'equalto', 2)
+         | map(attribute='item') | list
+         + _ra_helper_check.results
+           | selectattr('rc', 'equalto', 0)
+           | rejectattr('stdout', 'search', _ra_version)
+           | map(attribute='item') | list }}
+
+- name: Compile missing C helper binaries from source
+  ansible.builtin.include_tasks: compile-helpers.yml
+  when: _ra_helpers_to_compile | length > 0

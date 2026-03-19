@@ -1,0 +1,27 @@
+# SPDX-License-Identifier: MIT
+---
+# Compile C helper binaries from ClusterLabs/resource-agents source
+
+- name: Install gcc
+  ansible.builtin.package:
+    name: gcc
+    state: present
+
+- name: Create heartbeat binary directory
+  ansible.builtin.file:
+    path: "{{ _ra_bin_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Download, compile, and stamp C helper binaries
+  ansible.builtin.shell:
+    cmd: |
+      set -e
+      {% for helper in _ra_helpers_to_compile %}
+      curl -fsSL -o /tmp/{{ _ra_helper_sources[helper] }} \
+        {{ _ra_github_raw_base }}/{{ _ra_version }}/tools/{{ _ra_helper_sources[helper] }}
+      gcc -O2 -o {{ _ra_bin_dir }}/{{ helper }} /tmp/{{ _ra_helper_sources[helper] }}
+      echo '{{ _ra_version }}' > {{ _ra_bin_dir }}/.{{ helper }}.version
+      rm -f /tmp/{{ _ra_helper_sources[helper] }}
+      {% endfor %}
+  changed_when: true

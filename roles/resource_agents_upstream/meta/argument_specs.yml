@@ -7,13 +7,13 @@ argument_specs:
       - Download missing OCF resource agents from the ClusterLabs GitHub repository.
       - Only agents not already present on the system are downloaded.
     options:
-      resource_agents_version:
+      resource_agents_upstream_version:
         type: str
         default: v4.16.0
         description:
           - GitHub release tag to download (for example C(v4.17.0)).
           - Empty string fetches the latest release.
-      resource_agents_list:
+      resource_agents_upstream_list:
         type: list
         elements: str
         default:

@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: MIT
 ---
-# vars file for resource_agents_fetch
+# vars file for resource_agents_upstream
 
 # OCF resource agent base path (SUSE uses /usr/lib, others use /lib)
 _ra_base: >-
@@ -11,11 +11,11 @@ _ra_base: >-
 _ra_github_repo: ClusterLabs/resource-agents
 _ra_github_raw_base: "https://raw.githubusercontent.com/{{ _ra_github_repo }}"
 _ra_github_api: "https://api.github.com/repos/{{ _ra_github_repo }}/releases/latest"
-_ra_marker: Managed by linbit.drbd_reactor.resource_agents_fetch
+_ra_marker: Managed by linbit.drbd_reactor.resource_agents_upstream
 
 _ra_version: >-
-  {{ resource_agents_version
-     if resource_agents_version | length > 0
+  {{ resource_agents_upstream_version
+     if resource_agents_upstream_version | length > 0
      else (lookup('ansible.builtin.url', _ra_github_api, split_lines=false)
            | from_json).tag_name }}
 
@@ -62,3 +62,19 @@ _ra_lib_substitutions:
   '@INITDIR@': /etc/init.d
   '@HA_RSCTMPDIR@': /run/resource-agents
   '@HA_VARRUNDIR@': /run
+
+# Heartbeat binary directory for C helper utilities (send_arp, tickle_tcp)
+_ra_bin_dir: >-
+  {{ '/usr/lib64/heartbeat'
+     if ansible_facts['os_family'] | lower == 'suse'
+     else '/usr/libexec/heartbeat' }}
+
+# C helper binaries to compile from source
+_ra_helpers:
+  - send_arp
+  - tickle_tcp
+
+# Source file names in the tools/ directory of the resource-agents repo
+_ra_helper_sources:
+  send_arp: send_arp.linux.c
+  tickle_tcp: tickle_tcp.c
