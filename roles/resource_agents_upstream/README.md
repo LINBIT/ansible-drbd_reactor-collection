@@ -22,6 +22,7 @@ The `resource-agents` package availability varies across distributions:
 | RHEL 10 family with LINBIT customer repos | — | Not yet available in the LINBIT `drbd-9` repository. |
 
 This role avoids the complexity of enabling distribution-specific repositories by downloading agents directly from [ClusterLabs/resource-agents](https://github.com/ClusterLabs/resource-agents) on GitHub.
+It also avoids pulling in extraneous Pacemaker packages that are not needed for DRBD Reactor managed services.
 It works consistently across all supported distributions without additional repository configuration.
 
 Downloaded agents are stamped with a version marker comment after the shebang line.
