@@ -3,8 +3,26 @@ resource_agents_upstream
 
 Download missing OCF resource agents from the ClusterLabs GitHub repository.
 
-This role is useful on distributions where the `resource-agents` package is missing or incomplete.
-For example, AlmaLinux 10 has no `resource-agents` package, and Ubuntu 22.04 is missing the `nvmet-*` agents.
+This role is useful on distributions where the `resource-agents` package is missing, incomplete, or requires enabling additional repositories.
+It bypasses distribution-specific packaging differences by downloading individual agents directly from source.
+
+### Distribution availability of resource-agents
+
+The `resource-agents` package availability varies across distributions:
+
+| Distribution | Package | Repository |
+|---|---|---|
+| Debian, Proxmox VE, Ubuntu 22.04 and earlier | `resource-agents` | Default repositories. |
+| Ubuntu 24.04 and later | `resource-agents-base` | Default repositories. `IPaddr2` moved to a separate package. |
+| RHEL family with LINBIT customer repos | `resource-agents` | Included in the LINBIT `drbd-9` customer repository. |
+| RHEL (without LINBIT repos) | `resource-agents` | Requires the HA Add-On subscription (`highavailability-rpms`). |
+| AlmaLinux, Rocky Linux | `resource-agents` | Requires enabling the `ha` repository. |
+| Oracle Linux | `resource-agents` | Requires enabling the `addons` repository. |
+| SLES, openSUSE Leap | `resource-agents` | Default repositories. |
+| RHEL 10 family with LINBIT customer repos | — | Not yet available in the LINBIT `drbd-9` repository. |
+
+This role avoids the complexity of enabling distribution-specific repositories by downloading agents directly from [ClusterLabs/resource-agents](https://github.com/ClusterLabs/resource-agents) on GitHub.
+It works consistently across all supported distributions without additional repository configuration.
 
 Downloaded agents are stamped with a version marker comment after the shebang line.
 On subsequent runs, the role uses this marker to distinguish its own downloads from system-installed agents:
