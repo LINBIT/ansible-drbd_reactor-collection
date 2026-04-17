@@ -18,7 +18,7 @@
 
 - name: Check for DRBD Reactor updates
   ansible.builtin.package:
-    name: drbd-reactor
+    name: "{{ reactor_install_packages }}"
     state: "{{ reactor_install_package_state }}"
   register: _reactor_install_packages
   notify: restart_drbd_reactor
