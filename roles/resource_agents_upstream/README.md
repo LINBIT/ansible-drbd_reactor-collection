@@ -33,8 +33,15 @@ On subsequent runs, the role uses this marker to distinguish its own downloads f
 - **File exists with marker, different version**: re-download and update marker.
 - **File exists without marker**: system-installed RA, leave untouched.
 
-The role also compiles C helper binaries (`send_arp`, `tickle_tcp`) from source when they are not already present.
-These binaries are required by the `IPaddr2` and `portblock` resource agents for gratuitous ARP and TCP connection tickling after failover.
+The role also compiles C helper binaries from source when they are not already present.
+Which helpers are compiled depends on the contents of `resource_agents_upstream_list`:
+
+| Resource agent | C helper | Purpose |
+|---|---|---|
+| `IPaddr2` | `send_arp` | Gratuitous ARP announcement after IP takeover. |
+| `portblock` | `tickle_tcp` | TCP connection tickling to drop stale sessions after failover. |
+
+If none of the listed resource agents need a helper, no binaries are compiled and `gcc` is not installed.
 The same version-stamp pattern applies: binaries installed by a system package are left untouched, and recompilation only occurs when the version changes.
 Compilation requires `gcc`, which the role installs automatically when needed.
 
