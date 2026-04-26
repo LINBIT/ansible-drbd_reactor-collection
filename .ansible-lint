@@ -1,6 +1,4 @@
 ---
 skip_list:
-  # Both roles use underscore-prefixed private variables (_ra_*, _reactor_install_*)
-  # scoped to a single role. The leading underscore already signals "internal";
-  # enforcing the full role name prefix adds verbosity without safety benefit.
+  # Allow short variable (typically underscored) names for long role names
   - var-naming[no-role-prefix]
