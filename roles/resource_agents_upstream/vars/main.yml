@@ -78,12 +78,7 @@ _ra_helper_sources:
 # IPaddr2 needs send_arp for gratuitous ARP on takeover
 # portblock needs tickle_tcp for TCP tickling to drop stale sessions
 _ra_helpers: >-
-  {%- if 'IPaddr2' in resource_agents_upstream_list and 'portblock' in resource_agents_upstream_list -%}
-    ['send_arp', 'tickle_tcp']
-  {%- elif 'IPaddr2' in resource_agents_upstream_list -%}
-    ['send_arp']
-  {%- elif 'portblock' in resource_agents_upstream_list -%}
-    ['tickle_tcp']
-  {%- else -%}
-    []
-  {%- endif -%}
+  {{
+    (['send_arp'] if 'IPaddr2' in resource_agents_upstream_list else [])
+    + (['tickle_tcp'] if 'portblock' in resource_agents_upstream_list else [])
+  }}
