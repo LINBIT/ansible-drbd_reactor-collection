@@ -13,15 +13,6 @@ argument_specs:
         description:
           - Include C(linbit.drbd.drbd_install) to install DRBD.
           - Set to C(false) when DRBD is already managed by a calling role.
-      reactor_install_package_state:
-        type: str
-        default: latest
-        choices:
-          - latest
-          - present
-        description:
-          - Package state for the DRBD Reactor package.
-          - Set C(present) to skip upgrades.
       reactor_install_resource_agents_upstream:
         type: bool
         default: true

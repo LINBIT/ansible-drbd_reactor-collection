@@ -14,7 +14,6 @@ Role Variables
 | Variable | Default | Description |
 |---|---|---|
 | `reactor_install_drbd` | `true` | Include `linbit.drbd.drbd_install` to install DRBD. Set to `false` when DRBD is already managed by a calling role (for example `satellite_install`). |
-| `reactor_install_package_state` | `latest` | Package state for DRBD Reactor package; set `present` to skip upgrades |
 | `reactor_install_resource_agents_upstream` | `true` | Include `resource_agents_upstream` role to install missing OCF resource agents from GitHub |
 
 Dependencies

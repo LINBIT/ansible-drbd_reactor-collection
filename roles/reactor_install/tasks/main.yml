@@ -16,18 +16,41 @@
     name: linbit.drbd.drbd_install
   when: reactor_install_drbd | bool
 
-- name: Check for DRBD Reactor updates
-  ansible.builtin.package:
-    name: "{{ reactor_install_packages }}"
-    state: "{{ reactor_install_package_state }}"
-  register: _reactor_install_packages
-  notify: restart_drbd_reactor
-
 - name: Install OCF resource agents from GitHub
   ansible.builtin.include_role:
     name: linbit.drbd_reactor.resource_agents_upstream
   when: reactor_install_resource_agents_upstream | bool
 
-- name: Configure DRBD Reactor
-  ansible.builtin.include_tasks: configure-reactor.yml
-  when: _reactor_install_packages is changed  # noqa: no-handler
+- name: Install DRBD Reactor
+  ansible.builtin.package:
+    name: "{{ reactor_install_packages }}"
+    state: present
+  register: _reactor_install_packages
+
+- name: Start and enable DRBD Reactor
+  ansible.builtin.systemd_service:
+    name: drbd-reactor.service
+    state: started
+    enabled: true
+
+# https://github.com/LINBIT/drbd-reactor?tab=readme-ov-file#automatic-reload
+- name: Enable automatic reload for DRBD Reactor
+  ansible.builtin.copy:
+    src: "{{ drbd_reactor_examples_dir }}/{{ item }}"
+    dest: "/etc/systemd/system/{{ item }}"
+    mode: '0644'
+    remote_src: true
+  with_items:
+    - 'drbd-reactor-reload.path'
+    - 'drbd-reactor-reload.service'
+  register: _reactor_reload
+
+- name: Enable and start drbd-reactor-reload
+  ansible.builtin.systemd_service:
+    name: drbd-reactor-reload.path
+    daemon_reload: "{{ _reactor_reload is changed }}"
+    state: started
+    enabled: true
+
+- name: Flush handlers for role - reactor_install
+  ansible.builtin.meta: flush_handlers
