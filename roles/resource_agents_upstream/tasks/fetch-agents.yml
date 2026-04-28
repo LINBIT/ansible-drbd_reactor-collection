@@ -4,7 +4,7 @@
 
 - name: Create OCF resource agent directory
   ansible.builtin.file:
-    path: "{{ _ra_base }}"
+    path: "{{ _ra_base_dir }}"
     state: directory
     mode: "0755"
 
@@ -13,7 +13,7 @@
     url: >-
       {{ _ra_github_raw_base }}/{{ _ra_version }}/heartbeat/{{ item }}{{ '.in'
          if item in _ra_templates else '' }}
-    dest: "{{ _ra_base }}/{{ item }}"
+    dest: "{{ _ra_base_dir }}/{{ item }}"
     mode: "0755"
   loop: "{{ _ra_to_download }}"
 
@@ -23,12 +23,12 @@
       set -e
       {% for ra in _ra_to_download %}
       {% if ra in _ra_templates %}
-      sed -i 's|@BASH_SHELL@|/bin/bash|g' {{ _ra_base }}/{{ ra }}
+      sed -i 's|@BASH_SHELL@|/bin/bash|g' {{ _ra_base_dir }}/{{ ra }}
       {% endif %}
-      sed -i '/^#!/ a # {{ _ra_marker }} {{ _ra_version }}' {{ _ra_base }}/{{ ra }}
+      sed -i '/^#!/ a # {{ _ra_marker }} {{ _ra_version }}' {{ _ra_base_dir }}/{{ ra }}
       {% endfor %}
-  changed_when: true
   when: _ra_to_download | length > 0
+  changed_when: true
 
 # --- OCF shell library (ocf-shellfuncs and dependencies) ---
 
@@ -37,10 +37,10 @@
     path: "{{ item }}"
     state: directory
     mode: "0755"
-  loop:
-    - "{{ _ra_lib_base }}"
-    - /run/resource-agents
   when: _ra_lib_needs_download | bool
+  loop:
+    - "{{ _ra_lib_base_dir }}"
+    - /run/resource-agents
 
 - name: Persist resource agents runtime directory across reboots
   ansible.builtin.copy:
@@ -52,18 +52,18 @@
 - name: Download OCF shell library template files from GitHub
   ansible.builtin.get_url:
     url: "{{ _ra_github_raw_base }}/{{ _ra_version }}/heartbeat/{{ item }}.in"
-    dest: "{{ _ra_lib_base }}/{{ item }}"
+    dest: "{{ _ra_lib_base_dir }}/{{ item }}"
     mode: "0644"
-  loop: "{{ _ra_lib_templates }}"
   when: _ra_lib_needs_download | bool
+  loop: "{{ _ra_lib_templates }}"
 
 - name: Download OCF shell library plain files from GitHub
   ansible.builtin.get_url:
     url: "{{ _ra_github_raw_base }}/{{ _ra_version }}/heartbeat/{{ item }}"
-    dest: "{{ _ra_lib_base }}/{{ item }}"
+    dest: "{{ _ra_lib_base_dir }}/{{ item }}"
     mode: "0644"
-  loop: "{{ _ra_lib_plain }}"
   when: _ra_lib_needs_download | bool
+  loop: "{{ _ra_lib_plain }}"
 
 - name: Apply autoconf substitutions to OCF shell library templates  # noqa: command-instead-of-module risky-shell-pipe
   ansible.builtin.shell:
@@ -73,14 +73,14 @@
       -e 's|{{ key }}|{{ value }}|g'
       {% endfor %}
       {% for file in _ra_lib_templates %}
-      {{ _ra_lib_base }}/{{ file }}
+      {{ _ra_lib_base_dir }}/{{ file }}
       {% endfor %}
-  changed_when: true
   when: _ra_lib_needs_download | bool
+  changed_when: true
 
 - name: Add version marker to OCF shell library
   ansible.builtin.lineinfile:
-    path: "{{ _ra_lib_base }}/ocf-shellfuncs"
+    path: "{{ _ra_lib_base_dir }}/ocf-shellfuncs"
     regexp: "^# {{ _ra_marker | regex_escape() }}"
     insertbefore: BOF
     line: "# {{ _ra_marker }} {{ _ra_version }}"

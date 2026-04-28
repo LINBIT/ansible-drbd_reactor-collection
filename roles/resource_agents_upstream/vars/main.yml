@@ -3,7 +3,7 @@
 # vars file for resource_agents_upstream
 
 # OCF resource agent base path (SUSE uses /usr/lib, others use /lib)
-_ra_base: >-
+_ra_base_dir: >-
   {{ '/usr/lib/ocf/resource.d/heartbeat'
      if ansible_facts['os_family'] | lower == 'suse'
      else '/lib/ocf/resource.d/heartbeat' }}
@@ -24,8 +24,8 @@ _ra_templates:
   - iSCSITarget
   - iSCSILogicalUnit
 
-# OCF shell library installed to {{ _ra_lib_base }}
-_ra_lib_base: "{{ _ra_base | dirname | dirname }}/lib/heartbeat"
+# OCF shell library installed to {{ _ra_lib_base_dir }}
+_ra_lib_base_dir: "{{ _ra_base_dir | dirname | dirname }}/lib/heartbeat"
 
 # Library files that are .in templates on GitHub
 _ra_lib_templates:
