@@ -4,18 +4,19 @@ name: drbd_reactor
 version: 0.9.5
 readme: README.md
 authors:
-- Ryan Ronnander <rronnander@linbit.com>
-- Matt Kereczman <matt@linbit.com>
-- Michael Troutman <michael@linbit.com>
-- Devin Vance <devin@linbit.com>
+  - Ryan Ronnander <rronnander@linbit.com>
+  - Matt Kereczman <matt@linbit.com>
+  - Michael Troutman <michael@linbit.com>
+  - Devin Vance <devin@linbit.com>
 description: Install and configure DRBD Reactor
 license:
-- MIT
+  - MIT
 tags:
-- linbit
-- drbd
-- drbdreactor
-- ha
+  - infrastructure
+  - linbit
+  - drbd
+  - drbdreactor
+  - ha
 # dependencies:
   # linbit.common: '*'  # uncomment when published to Ansible Galaxy
   # linbit.drbd: '*'    # uncomment when published to Ansible Galaxy
