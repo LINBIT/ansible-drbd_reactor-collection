@@ -16,6 +16,10 @@
     dest: "{{ _ra_base_dir }}/{{ item }}"
     mode: "0755"
   loop: "{{ _ra_to_download }}"
+  register: _ra_download
+  until: _ra_download is succeeded
+  retries: 3
+  delay: 10
 
 - name: Substitute @BASH_SHELL@ and add version markers to downloaded resource agents  # noqa: risky-shell-pipe
   ansible.builtin.shell:
@@ -56,6 +60,10 @@
     mode: "0644"
   when: _ra_lib_needs_download | bool
   loop: "{{ _ra_lib_templates }}"
+  register: _ra_lib_template_download
+  until: _ra_lib_template_download is succeeded
+  retries: 3
+  delay: 10
 
 - name: Download OCF shell library plain files from GitHub
   ansible.builtin.get_url:
@@ -64,6 +72,10 @@
     mode: "0644"
   when: _ra_lib_needs_download | bool
   loop: "{{ _ra_lib_plain }}"
+  register: _ra_lib_plain_download
+  until: _ra_lib_plain_download is succeeded
+  retries: 3
+  delay: 10
 
 - name: Apply autoconf substitutions to OCF shell library templates  # noqa: command-instead-of-module risky-shell-pipe
   ansible.builtin.shell:
