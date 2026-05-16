@@ -1,0 +1,12 @@
+---
+ancestor: 0.9.6
+releases:
+  0.9.7:
+    changes:
+      release_summary: 'Version bump only, no user-facing changes. Released as part
+        of the coordinated 0.9.7 cut across the LINBIT Ansible collections.
+
+        '
+    fragments:
+      - 0.9.7.yml
+    release_date: '2026-05-13'
