@@ -15,3 +15,9 @@ DRBD Reactor is the daemon that monitors DRBD resources and drives HA services v
 | Collection | Purpose |
 |---|---|
 | `linbit.drbd` | DRBD kernel module installation (required by `reactor_install`) |
+
+## License
+
+MIT License.
+
+See [LICENSE](LICENSE) for the full text.
