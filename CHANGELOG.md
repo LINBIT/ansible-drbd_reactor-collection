@@ -2,14 +2,25 @@
 
 **Topics**
 
-- <a href="#v0-9-7">v0\.9\.7</a>
+- <a href="#v0-9-8">v0\.9\.8</a>
     - <a href="#release-summary">Release Summary</a>
+- <a href="#v0-9-7">v0\.9\.7</a>
+    - <a href="#release-summary-1">Release Summary</a>
+
 This changelog describes changes after version 0\.9\.6\.
+
+<a id="v0-9-8"></a>
+## v0\.9\.8
+
+<a id="release-summary"></a>
+### Release Summary
+
+Version bump for sync across the LINBIT Ansible collections\. No user\-facing changes since 0\.9\.7\.
 
 <a id="v0-9-7"></a>
 ## v0\.9\.7
 
-<a id="release-summary"></a>
+<a id="release-summary-1"></a>
 ### Release Summary
 
 Version bump only\, no user\-facing changes\. Released as part of the coordinated 0\.9\.7 cut across the LINBIT Ansible collections\.

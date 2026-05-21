@@ -10,3 +10,10 @@ releases:
     fragments:
       - 0.9.7.yml
     release_date: '2026-05-13'
+  0.9.8:
+    changes:
+      release_summary: Version bump for sync across the LINBIT Ansible collections.
+        No user-facing changes since 0.9.7.
+    fragments:
+      - release_summary.yml
+    release_date: '2026-05-21'
