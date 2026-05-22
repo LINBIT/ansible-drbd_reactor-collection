@@ -1,7 +1,6 @@
-# Ansible Collection - linbit.drbd_reactor
+# LINBIT DRBD Reactor Collection
 
-Installs and configures DRBD Reactor.
-DRBD Reactor is the daemon that monitors DRBD resources and drives HA services via promoter plugins.
+The `linbit.drbd_reactor` Ansible collection for installing and configuring [DRBD Reactor](https://github.com/LINBIT/drbd-reactor).
 
 ## Roles
 
