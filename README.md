@@ -10,8 +10,8 @@ The `linbit.drbd_reactor` Ansible collection for installing and configuring [DRB
 
 | Role | Description |
 |---|---|
-| `reactor_install` | Install and enable DRBD Reactor with automatic config reloading. Dynamically includes `linbit.drbd.drbd_install` if DRBD is not already present on the node. |
-| `resource_agents_upstream` | Download missing OCF resource agents from the ClusterLabs GitHub repository. Only agents not already present on the system are downloaded. |
+| [`reactor_install`](roles/reactor_install/README.md) | Install and enable DRBD Reactor with automatic config reloading. Dynamically includes `linbit.drbd.drbd_install` if DRBD is not already present on the node. |
+| [`resource_agents_upstream`](roles/resource_agents_upstream/README.md) | Download missing OCF resource agents from the ClusterLabs GitHub repository. Only agents not already present on the system are downloaded. |
 
 ## Licensing
 
