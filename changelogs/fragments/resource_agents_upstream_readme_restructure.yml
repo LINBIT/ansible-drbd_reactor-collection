@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: MIT
+---
+minor_changes:
+  - >
+    resource_agents_upstream - restructure role README: add "How it works"
+    section with version-marker and idempotency details, link resource
+    agent names to source, move distribution availability table to
+    reference appendix.
