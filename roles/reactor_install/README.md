@@ -1,28 +1,23 @@
-reactor_install
-===============
+# reactor_install
 
 Install and configure DRBD Reactor.
 
-Requirements
-------------
+## Requirements
 
 None.
 
-Role Variables
---------------
+## Role Variables
 
 | Variable | Default | Description |
 |---|---|---|
-| `reactor_install_drbd` | `true` | Include `linbit.drbd.drbd_install` to install DRBD. Set to `false` when DRBD is already managed by a calling role (for example `satellite_install`). |
+| `reactor_install_drbd` | `true` | Include `linbit.drbd.drbd_install` to install DRBD; set `false` when DRBD is already managed by a calling role (for example `satellite_install`) |
 | `reactor_install_resource_agents_upstream` | `true` | Include `resource_agents_upstream` role to install missing OCF resource agents from GitHub |
 
-Dependencies
-------------
+## Dependencies
 
 `linbit.drbd.drbd_install`: included by default, disable with `reactor_install_drbd: false`.
 
-Example Playbook
-----------------
+## Example Playbook
 
 ```yaml
 - name: Install DRBD Reactor
@@ -34,12 +29,10 @@ Example Playbook
         name: linbit.drbd_reactor.reactor_install
 ```
 
-License
--------
+## License
 
 MIT
 
-Author Information
-------------------
+## Author Information
 
 [LINBIT](https://linbit.com)

@@ -17,9 +17,9 @@
   changed_when: false
   failed_when: false
 
-# rc=0: our file (marker found) — check version
-# rc=1: system file (exists, no marker) — leave alone
-# rc=2: file not found — needs download
+# rc=0: our file (marker found) - check version
+# rc=1: system file (exists, no marker) - leave alone
+# rc=2: file not found - needs download
 - name: Build list of resource agents to download
   ansible.builtin.set_fact:
     _ra_to_download: >-
@@ -50,9 +50,9 @@
 
 # --- C helper binaries (send_arp, tickle_tcp) ---
 
-# rc=0: our binary (stamp found) — check version
-# rc=1: system binary (exists, no stamp) — leave alone
-# rc=2: binary missing — needs compile
+# rc=0: our binary (stamp found) - check version
+# rc=1: system binary (exists, no stamp) - leave alone
+# rc=2: binary missing - needs compile
 - name: Check C helper binary version stamps
   ansible.builtin.shell:
     cmd: |

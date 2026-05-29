@@ -1,10 +1,8 @@
-resource_agents_upstream
-=====================
+# resource_agents_upstream
 
 Install OCF resource agents from [`ClusterLabs/resource-agents`](https://github.com/ClusterLabs/resource-agents) on GitHub.
 
-How it works
-------------
+## How it works
 
 - This role trades the cost of [compiling helper binaries](#c-helper-binaries) to avoid downsides with OS-packaged resource agents (missing select resource agents, older versions, etc).
 - It works consistently across all supported distributions without the need for extra distribution-specific HA repositories (Red Hat family distributions).
@@ -26,8 +24,7 @@ On subsequent runs, the role uses this marker to distinguish its own downloads f
 | RA exists with marker, different version | Re-download and update marker |
 | RA exists without marker | System-installed RA, leave untouched |
 
-C helper binaries
------------------
+## C helper binaries
 
 The role also compiles C helper binaries from source when they are not already present.
 Which helpers are compiled depends on the contents of `resource_agents_upstream_list`:
@@ -40,17 +37,15 @@ Which helpers are compiled depends on the contents of `resource_agents_upstream_
 The role installs `gcc` and compiles helpers only when an agent in `resource_agents_upstream_list` needs one (currently only `IPaddr2` or `portblock`).
 When an agent that uses a helper is updated, the binary is also checked and recompiled if needed.
 
-Requirements
-------------
+## Requirements
 
 None.
 
-Role Variables
---------------
+## Role Variables
 
 | Variable | Default | Description |
 |---|---|---|
-| `resource_agents_upstream_version` | `""` | Empty string (default) fetches the latest release from upstream. Pin to a specific GitHub release tag (for example `v4.18.0`) for reproducibility |
+| `resource_agents_upstream_version` | `""` | Empty (default) fetches the latest upstream release; pin to a GitHub release tag (for example `v4.18.0`) for reproducibility |
 | `resource_agents_upstream_list` | See defaults | List of OCF resource agent names to ensure are present |
 
 ### Default resource agents list
@@ -66,13 +61,11 @@ Role Variables
 - [`nvmet-namespace`](https://github.com/ClusterLabs/resource-agents/blob/main/heartbeat/nvmet-namespace)
 - [`nvmet-port`](https://github.com/ClusterLabs/resource-agents/blob/main/heartbeat/nvmet-port)
 
-Dependencies
-------------
+## Dependencies
 
 None.
 
-Example Playbook
-----------------
+## Example Playbook
 
 ```yaml
 - name: Install OCF resource agents
@@ -105,15 +98,14 @@ To install via `reactor_install` (enabled by default):
         reactor_install_resource_agents_upstream: true  # true by default
 ```
 
-Distribution availability of resource-agents
---------------------------------------------
+## Distribution availability of resource-agents
 
 For reference, the `resource-agents` package availability varies across distributions:
 
 | Distribution | Package | Repository |
 |---|---|---|
 | Debian, Proxmox VE, Ubuntu 22.04 and earlier | `resource-agents` | Default repositories |
-| Ubuntu 24.04 and later | `resource-agents-base` | Default repositories. [`IPaddr2`](https://github.com/ClusterLabs/resource-agents/blob/main/heartbeat/IPaddr2) moved to a separate package |
+| Ubuntu 24.04 and later | `resource-agents-base` | Default repositories; [`IPaddr2`](https://github.com/ClusterLabs/resource-agents/blob/main/heartbeat/IPaddr2) moved to a separate package |
 | Red Hat 8/9 family with LINBIT customer repos | `resource-agents` | Included in the LINBIT `drbd-9` or `pacemaker-2` customer repository |
 | Red Hat 10 family with LINBIT customer repos | `resource-agents` | Included in the LINBIT `pacemaker-3` customer repository (not yet in `drbd-9`) |
 | Red Hat (without LINBIT repos) | `resource-agents` | Requires the HA Add-On subscription (`highavailability-rpms`) |
@@ -121,12 +113,10 @@ For reference, the `resource-agents` package availability varies across distribu
 | Oracle Linux | `resource-agents` | Requires enabling the `addons` repository |
 | SLES, openSUSE Leap | `resource-agents` | Default repositories |
 
-License
--------
+## License
 
 MIT
 
-Author Information
-------------------
+## Author Information
 
 [LINBIT](https://linbit.com)
