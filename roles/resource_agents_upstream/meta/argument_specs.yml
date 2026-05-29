@@ -9,10 +9,10 @@ argument_specs:
     options:
       resource_agents_upstream_version:
         type: str
-        default: v4.16.0
+        default: ""
         description:
-          - GitHub release tag to download (for example C(v4.17.0)).
-          - Empty string fetches the latest release.
+          - GitHub release tag to download (for example C(v4.18.0)).
+          - Empty string (default) fetches the latest release from upstream.
       resource_agents_upstream_list:
         type: list
         elements: str

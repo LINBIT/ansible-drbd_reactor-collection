@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: MIT
+---
+minor_changes:
+  - >
+    resource_agents_upstream - change the default
+    ``resource_agents_upstream_version`` from ``v4.16.0`` to ``""``. The
+    role's name implies tracking upstream, so the default now fetches the
+    latest release from the ClusterLabs GitHub API on every run. Users who
+    need reproducibility can still pin to a specific tag
+    (for example ``v4.18.0``) via the role variable.

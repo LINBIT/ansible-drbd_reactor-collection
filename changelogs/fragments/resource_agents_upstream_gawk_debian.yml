@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: MIT
+---
+bugfixes:
+  - >
+    resource_agents_upstream - install ``gawk`` on the Debian family
+    (Debian, Ubuntu, Proxmox VE). The upstream ``resource-agents`` Debian
+    package depends on ``gawk`` because ``findif.sh`` (called by
+    ``IPaddr2``) uses gawk-specific extensions like the 3-argument
+    ``match(string, regex, array)`` form. Without ``gawk``, ``/usr/bin/awk``
+    resolves to ``mawk`` (Debian's default), and ``findif.sh`` exits with
+    ``syntax error at or near ,``, causing ``IPaddr2`` to fail to start
+    and the ``drbd-services@`` target to fail with a dependency error.

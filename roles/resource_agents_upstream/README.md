@@ -50,7 +50,7 @@ Role Variables
 
 | Variable | Default | Description |
 |---|---|---|
-| `resource_agents_upstream_version` | `v4.16.0` | GitHub release tag to download (for example `v4.17.0`). Empty string fetches the latest release |
+| `resource_agents_upstream_version` | `""` | Empty string (default) fetches the latest release from upstream. Pin to a specific GitHub release tag (for example `v4.18.0`) for reproducibility |
 | `resource_agents_upstream_list` | See defaults | List of OCF resource agent names to ensure are present |
 
 ### Default resource agents list
@@ -85,14 +85,14 @@ Example Playbook
         name: linbit.drbd_reactor.resource_agents_upstream
 ```
 
-To install a specific version:
+To pin to a specific version:
 
 ```yaml
-    - name: Install OCF resource agents v4.17.0
+    - name: Install OCF resource agents v4.18.0
       ansible.builtin.import_role:
         name: linbit.drbd_reactor.resource_agents_upstream
       vars:
-        resource_agents_upstream_version: v4.17.0
+        resource_agents_upstream_version: v4.18.0
 ```
 
 To install via `reactor_install` (enabled by default):
