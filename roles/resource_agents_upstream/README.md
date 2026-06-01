@@ -7,6 +7,10 @@ Install OCF resource agents from [`ClusterLabs/resource-agents`](https://github.
 - This role trades the cost of [compiling helper binaries](#c-helper-binaries) to avoid downsides with OS-packaged resource agents (missing select resource agents, older versions, etc).
 - It works consistently across all supported distributions without the need for extra distribution-specific HA repositories (Red Hat family distributions).
 - It also avoids pulling in extraneous Pacemaker packages (not needed for DRBD Reactor managed services).
+- The control host is the only host that fetches content from GitHub.
+- Resource agents, OCF shell library files, and C helper sources are saved to `/tmp/linbit-resource-agents/<version>/`, then distributed to target nodes.
+- This avoids GitHub rate limiting in larger clusters.
+- C helper binaries are compiled on each node to match its architecture and C library.
 
 Downloaded agents are stamped with a version marker comment after the shebang line:
 

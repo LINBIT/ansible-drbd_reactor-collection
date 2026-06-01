@@ -13,6 +13,9 @@ _ra_github_raw_base: "https://raw.githubusercontent.com/{{ _ra_github_repo }}"
 _ra_github_api: "https://api.github.com/repos/{{ _ra_github_repo }}/releases/latest"
 _ra_marker: Managed by linbit.drbd_reactor.resource_agents_upstream
 
+# Control node download cache to reduce fetching frequency from GitHub
+_ra_control_cache: /tmp/linbit-resource-agents
+
 _ra_version: >-
   {{ resource_agents_upstream_version
      if resource_agents_upstream_version | length > 0

@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: MIT
+---
+minor_changes:
+  - >
+    resource_agents_upstream - check every target node first, then download
+    only the resource agents, OCF shell library files, and C helper sources
+    that some node is missing once to a cache on the Ansible control host
+    (``/tmp/linbit-resource-agents/<version>/``), then distribute them to
+    target nodes by copy. Target nodes no longer reach GitHub directly, which
+    removes the per-node fan-out that triggered GitHub rate limiting on larger
+    clusters (6 or more nodes). A fully provisioned cluster fetches nothing.
+    The release version is resolved once and shared to all hosts, so the GitHub
+    API is queried a single time. The C helper binaries are still compiled on
+    each target node so they match that node's architecture and C library.

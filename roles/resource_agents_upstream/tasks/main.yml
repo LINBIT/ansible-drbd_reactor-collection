@@ -9,6 +9,11 @@
     state: present
   when: ansible_facts['os_family'] | lower == 'debian'
 
+- name: Resolve upstream resource-agents version on the control host
+  ansible.builtin.set_fact:
+    _ra_resolved_version: "{{ _ra_version }}"
+  run_once: true # noqa: run-once[task]
+
 - name: Check resource agent version markers
   ansible.builtin.command:
     cmd: "grep -m1 '{{ _ra_marker }}' {{ _ra_base_dir }}/{{ item }}"
@@ -28,7 +33,7 @@
          | map(attribute='item') | list
          + _ra_check.results
            | selectattr('rc', 'equalto', 0)
-           | rejectattr('stdout', 'search', _ra_version)
+           | rejectattr('stdout', 'search', _ra_resolved_version)
            | map(attribute='item') | list }}
 
 - name: Check OCF shell library version marker
@@ -42,13 +47,7 @@
   ansible.builtin.set_fact:
     _ra_lib_needs_download: >-
       {{ _ra_lib_check.rc == 2
-         or (_ra_lib_check.rc == 0 and _ra_version not in _ra_lib_check.stdout) }}
-
-- name: Fetch missing OCF resource agents from GitHub
-  ansible.builtin.include_tasks: fetch-agents.yml
-  when: _ra_to_download | length > 0 or _ra_lib_needs_download | bool
-
-# --- C helper binaries (send_arp, tickle_tcp) ---
+         or (_ra_lib_check.rc == 0 and _ra_resolved_version not in _ra_lib_check.stdout) }}
 
 # rc=0: our binary (stamp found) - check version
 # rc=1: system binary (exists, no stamp) - leave alone
@@ -76,8 +75,30 @@
          | map(attribute='item') | list
          + _ra_helper_check.results
            | selectattr('rc', 'equalto', 0)
-           | rejectattr('stdout', 'search', _ra_version)
+           | rejectattr('stdout', 'search', _ra_resolved_version)
            | map(attribute='item') | list }}
+
+- name: Aggregate download needs across all target nodes
+  ansible.builtin.set_fact:
+    _ra_fetch_list: >-
+      {{ ansible_play_hosts | map('extract', hostvars, '_ra_to_download')
+         | flatten | unique }}
+    _ra_fetch_lib: >-
+      {{ ansible_play_hosts | map('extract', hostvars, '_ra_lib_needs_download')
+         | map('bool') | select | list | length > 0 }}
+    _ra_fetch_helpers: >-
+      {{ ansible_play_hosts | map('extract', hostvars, '_ra_helpers_to_compile')
+         | flatten | unique }}
+  run_once: true # noqa: run-once[task]
+
+- name: Fetch resource agents to the control host cache
+  ansible.builtin.include_tasks: fetch-agents.yml
+  when: _ra_fetch_list | length > 0 or _ra_fetch_lib | bool or _ra_fetch_helpers | length > 0
+  run_once: true # noqa: run-once[task]
+
+- name: Distribute OCF resource agents to target nodes
+  ansible.builtin.include_tasks: distribute-agents.yml
+  when: _ra_to_download | length > 0 or _ra_lib_needs_download | bool
 
 - name: Compile missing C helper binaries from source
   ansible.builtin.include_tasks: compile-helpers.yml

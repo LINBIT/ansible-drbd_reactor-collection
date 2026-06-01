@@ -1,99 +1,74 @@
 # SPDX-License-Identifier: MIT
 ---
-# tasks file for resource_agents_upstream
-
-- name: Create OCF resource agent directory
+# All download tasks use 'throttle: 1' to keep GitHub rate limits in check
+- name: Create control host cache directories
   ansible.builtin.file:
-    path: "{{ _ra_base_dir }}"
+    path: "{{ _ra_control_cache }}/{{ _ra_resolved_version }}/{{ item }}"
     state: directory
     mode: "0755"
+  delegate_to: localhost
+  become: false
+  loop:
+    - heartbeat
+    - lib
+    - tools
 
-- name: Download resource agents from GitHub
+- name: Download resource agents to the control host cache
   ansible.builtin.get_url:
     url: >-
-      {{ _ra_github_raw_base }}/{{ _ra_version }}/heartbeat/{{ item }}{{ '.in'
+      {{ _ra_github_raw_base }}/{{ _ra_resolved_version }}/heartbeat/{{ item }}{{ '.in'
          if item in _ra_templates else '' }}
-    dest: "{{ _ra_base_dir }}/{{ item }}"
-    mode: "0755"
-  loop: "{{ _ra_to_download }}"
-  register: _ra_download
-  until: _ra_download is succeeded
+    dest: "{{ _ra_control_cache }}/{{ _ra_resolved_version }}/heartbeat/{{ item }}"
+    mode: "0644"
+  delegate_to: localhost
+  become: false
+  loop: "{{ _ra_fetch_list }}"
+  register: _ra_cache_download
+  until: _ra_cache_download is succeeded
   retries: 3
   delay: 10
+  throttle: 1
 
-- name: Substitute @BASH_SHELL@ and add version markers to downloaded resource agents  # noqa: risky-shell-pipe
-  ansible.builtin.shell:
-    cmd: |
-      set -e
-      {% for ra in _ra_to_download %}
-      {% if ra in _ra_templates %}
-      sed -i 's|@BASH_SHELL@|/bin/bash|g' {{ _ra_base_dir }}/{{ ra }}
-      {% endif %}
-      sed -i '/^#!/ a # {{ _ra_marker }} {{ _ra_version }}' {{ _ra_base_dir }}/{{ ra }}
-      {% endfor %}
-  when: _ra_to_download | length > 0
-  changed_when: true
-
-# --- OCF shell library (ocf-shellfuncs and dependencies) ---
-
-- name: Create OCF shell library and runtime directories
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: directory
-    mode: "0755"
-  when: _ra_lib_needs_download | bool
-  loop:
-    - "{{ _ra_lib_base_dir }}"
-    - /run/resource-agents
-
-- name: Persist resource agents runtime directory across reboots
-  ansible.builtin.copy:
-    content: "d /run/resource-agents 0755 root root -\n"
-    dest: /etc/tmpfiles.d/resource-agents.conf
-    mode: "0644"
-  when: _ra_lib_needs_download | bool
-
-- name: Download OCF shell library template files from GitHub
+- name: Download OCF shell library template files to the control host cache
   ansible.builtin.get_url:
-    url: "{{ _ra_github_raw_base }}/{{ _ra_version }}/heartbeat/{{ item }}.in"
-    dest: "{{ _ra_lib_base_dir }}/{{ item }}"
+    url: "{{ _ra_github_raw_base }}/{{ _ra_resolved_version }}/heartbeat/{{ item }}.in"
+    dest: "{{ _ra_control_cache }}/{{ _ra_resolved_version }}/lib/{{ item }}"
     mode: "0644"
-  when: _ra_lib_needs_download | bool
+  when: _ra_fetch_lib | bool
+  delegate_to: localhost
+  become: false
   loop: "{{ _ra_lib_templates }}"
-  register: _ra_lib_template_download
-  until: _ra_lib_template_download is succeeded
+  register: _ra_cache_lib_template
+  until: _ra_cache_lib_template is succeeded
   retries: 3
   delay: 10
+  throttle: 1
 
-- name: Download OCF shell library plain files from GitHub
+- name: Download OCF shell library plain files to the control host cache
   ansible.builtin.get_url:
-    url: "{{ _ra_github_raw_base }}/{{ _ra_version }}/heartbeat/{{ item }}"
-    dest: "{{ _ra_lib_base_dir }}/{{ item }}"
+    url: "{{ _ra_github_raw_base }}/{{ _ra_resolved_version }}/heartbeat/{{ item }}"
+    dest: "{{ _ra_control_cache }}/{{ _ra_resolved_version }}/lib/{{ item }}"
     mode: "0644"
-  when: _ra_lib_needs_download | bool
+  when: _ra_fetch_lib | bool
+  delegate_to: localhost
+  become: false
   loop: "{{ _ra_lib_plain }}"
-  register: _ra_lib_plain_download
-  until: _ra_lib_plain_download is succeeded
+  register: _ra_cache_lib_plain
+  until: _ra_cache_lib_plain is succeeded
   retries: 3
   delay: 10
+  throttle: 1
 
-- name: Apply autoconf substitutions to OCF shell library templates  # noqa: command-instead-of-module risky-shell-pipe
-  ansible.builtin.shell:
-    cmd: >-
-      sed -i
-      {% for key, value in _ra_lib_substitutions.items() %}
-      -e 's|{{ key }}|{{ value }}|g'
-      {% endfor %}
-      {% for file in _ra_lib_templates %}
-      {{ _ra_lib_base_dir }}/{{ file }}
-      {% endfor %}
-  when: _ra_lib_needs_download | bool
-  changed_when: true
-
-- name: Add version marker to OCF shell library
-  ansible.builtin.lineinfile:
-    path: "{{ _ra_lib_base_dir }}/ocf-shellfuncs"
-    regexp: "^# {{ _ra_marker | regex_escape() }}"
-    insertbefore: BOF
-    line: "# {{ _ra_marker }} {{ _ra_version }}"
-  when: _ra_lib_needs_download | bool
+- name: Download C helper sources to the control host cache
+  ansible.builtin.get_url:
+    url: "{{ _ra_github_raw_base }}/{{ _ra_resolved_version }}/tools/{{ _ra_helper_sources[item] }}"
+    dest: "{{ _ra_control_cache }}/{{ _ra_resolved_version }}/tools/{{ _ra_helper_sources[item] }}"
+    mode: "0644"
+  delegate_to: localhost
+  become: false
+  loop: "{{ _ra_fetch_helpers }}"
+  register: _ra_cache_helper
+  until: _ra_cache_helper is succeeded
+  retries: 3
+  delay: 10
+  throttle: 1
