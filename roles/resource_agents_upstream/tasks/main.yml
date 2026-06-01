@@ -78,16 +78,19 @@
            | rejectattr('stdout', 'search', _ra_resolved_version)
            | map(attribute='item') | list }}
 
-- name: Aggregate download needs across all target nodes
+- name: Build control-host fetch list from per-node requirements
   ansible.builtin.set_fact:
     _ra_fetch_list: >-
-      {{ ansible_play_hosts | map('extract', hostvars, '_ra_to_download')
+      {{ ansible_play_hosts | map('extract', hostvars)
+         | map(attribute='_ra_to_download', default=[])
          | flatten | unique }}
     _ra_fetch_lib: >-
-      {{ ansible_play_hosts | map('extract', hostvars, '_ra_lib_needs_download')
+      {{ ansible_play_hosts | map('extract', hostvars)
+         | map(attribute='_ra_lib_needs_download', default=false)
          | map('bool') | select | list | length > 0 }}
     _ra_fetch_helpers: >-
-      {{ ansible_play_hosts | map('extract', hostvars, '_ra_helpers_to_compile')
+      {{ ansible_play_hosts | map('extract', hostvars)
+         | map(attribute='_ra_helpers_to_compile', default=[])
          | flatten | unique }}
   run_once: true # noqa: run-once[task]
 
