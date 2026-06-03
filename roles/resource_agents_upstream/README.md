@@ -45,7 +45,7 @@ When an agent that uses a helper is updated, the binary is also checked and reco
 
 None.
 
-## Role Variables
+## Role variables
 
 | Variable | Default | Description |
 |---|---|---|
@@ -69,7 +69,7 @@ None.
 
 None.
 
-## Example Playbook
+## Example playbook
 
 ```yaml
 - name: Install OCF resource agents
@@ -121,6 +121,6 @@ For reference, the `resource-agents` package availability varies across distribu
 
 MIT
 
-## Author Information
+## Author information
 
 [LINBIT](https://linbit.com)

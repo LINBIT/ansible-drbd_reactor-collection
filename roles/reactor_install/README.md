@@ -6,7 +6,7 @@ Install and configure DRBD Reactor.
 
 None.
 
-## Role Variables
+## Role variables
 
 | Variable | Default | Description |
 |---|---|---|
@@ -17,7 +17,7 @@ None.
 
 `linbit.drbd.drbd_install`: included by default, disable with `reactor_install_drbd: false`.
 
-## Example Playbook
+## Example playbook
 
 ```yaml
 - name: Install DRBD Reactor
@@ -33,6 +33,6 @@ None.
 
 MIT
 
-## Author Information
+## Author information
 
 [LINBIT](https://linbit.com)
