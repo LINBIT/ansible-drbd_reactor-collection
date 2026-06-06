@@ -15,6 +15,7 @@ tags:
   - drbdreactor
   - ha
 dependencies:
+  community.general: '>=11.0.0'
   linbit.common: '*'
   linbit.drbd: '*'
 repository: https://github.com/LINBIT/ansible-drbd_reactor-collection

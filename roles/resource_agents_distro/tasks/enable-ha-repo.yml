@@ -1,0 +1,51 @@
+# SPDX-License-Identifier: MIT
+---
+- name: Enable High Availability repository (AlmaLinux, Rocky Linux)
+  ansible.builtin.command:
+    cmd: "dnf config-manager --set-enabled {{ _ra_distro_alma_ha_repo }}"
+  when: ansible_facts['distribution'] in ['AlmaLinux', 'Rocky']
+  changed_when: false
+
+- name: Enable addons repository (Oracle Linux)
+  ansible.builtin.command:
+    cmd: "dnf config-manager --set-enabled ol{{ ansible_facts['distribution_major_version'] }}_addons"
+  when: ansible_facts['distribution'] == 'OracleLinux'
+  changed_when: false
+
+- name: Enable High Availability Add-On repository (Red Hat Enterprise Linux)
+  ansible.builtin.command:
+    cmd: "subscription-manager repos --enable=rhel-{{ ansible_facts['distribution_major_version'] }}-for-x86_64-highavailability-rpms"
+  when: ansible_facts['distribution'] == 'RedHat'
+  register: _ra_distro_rhel_ha
+  changed_when: false
+  failed_when: false
+
+- name: Fail when the Red Hat High Availability repository cannot be enabled
+  ansible.builtin.fail:
+    msg: >-
+      Could not enable the Red Hat High Availability Add-On repository. Register the
+      system with an entitlement that includes the High Availability Add-On, or
+      configure LINBIT pacemaker repositories, then re-run.
+  when:
+    - ansible_facts['distribution'] == 'RedHat'
+    - _ra_distro_rhel_ha.rc != 0
+
+- name: Enable High Availability extension (SUSE Linux Enterprise Server)
+  ansible.builtin.command:
+    cmd: >-
+      SUSEConnect -p sle-ha/{{ ansible_facts['distribution_version'] }}/{{ ansible_facts['architecture'] }}
+      {{ ('-r ' ~ resource_agents_distro_sle_ha_regcode) if resource_agents_distro_sle_ha_regcode | length > 0 else '' }}
+  when: ansible_facts['distribution'] == 'SLES'
+  register: _ra_distro_sles_ha
+  changed_when: false
+  failed_when: false
+
+- name: Fail when the SLES High Availability extension cannot be activated
+  ansible.builtin.fail:
+    msg: >-
+      Could not activate the SUSE Linux Enterprise High Availability extension. Set
+      resource_agents_distro_sle_ha_regcode, register the system with SUSEConnect, or
+      configure LINBIT pacemaker repositories, then re-run.
+  when:
+    - ansible_facts['distribution'] == 'SLES'
+    - _ra_distro_sles_ha.rc != 0

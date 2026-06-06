@@ -1,0 +1,24 @@
+# SPDX-License-Identifier: MIT
+---
+argument_specs:
+  main:
+    short_description: Install resource agents from distribution repositories
+    description:
+      - Install the distribution C(resource-agents) package with weak dependencies disabled.
+      - Enable the per-distribution High Availability repository when no LINBIT pacemaker repository is present.
+    options:
+      resource_agents_distro_packages:
+        type: list
+        elements: str
+        default:
+          - resource-agents
+        description:
+          - Resource agent package names to install from distribution repositories.
+          - On Ubuntu 24.04 and later, C(resource-agents) is split, so base, common, and extra are installed.
+      resource_agents_distro_sle_ha_regcode:
+        type: str
+        default: ""
+        description:
+          - SUSE Linux Enterprise High Availability extension registration code.
+          - Used only on SLES when no LINBIT pacemaker repository is present.
+          - Empty (default) relies on an existing system entitlement.

@@ -1,0 +1,4 @@
+# SPDX-License-Identifier: MIT
+---
+resource_agents_distro_packages:
+  - resource-agents

@@ -1,0 +1,52 @@
+# SPDX-License-Identifier: MIT
+---
+# tasks file for resource_agents_distro
+
+- name: Gather OS facts for OS-specific vars
+  ansible.builtin.setup:
+    gather_subset:
+      - "!all"
+      - min
+  when: ansible_facts['os_family'] is not defined
+
+- name: Load OS-specific variables
+  ansible.builtin.include_vars: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_facts['distribution'] | lower }}-{{ ansible_facts['distribution_major_version'] }}.yml"
+        - "{{ ansible_facts['distribution'] | lower }}.yml"
+        - "{{ ansible_facts['os_family'] | lower }}.yml"
+        - "default.yml"
+      paths:
+        - "{{ role_path }}/vars"
+      skip: true
+
+- name: Check for enabled LINBIT pacemaker repositories (DNF)
+  ansible.builtin.command:
+    cmd: dnf repolist --enabled
+  when: ansible_facts['os_family'] | lower == 'redhat'
+  register: _ra_distro_dnf_repolist
+  changed_when: false
+
+- name: Check for enabled LINBIT pacemaker repositories (Zypper)
+  ansible.builtin.command:
+    cmd: zypper --non-interactive --no-refresh repos
+  when: ansible_facts['os_family'] | lower == 'suse'
+  register: _ra_distro_zypper_repos
+  changed_when: false
+  failed_when: false
+
+- name: Determine whether a LINBIT pacemaker repository is present
+  ansible.builtin.set_fact:
+    _ra_distro_linbit_repo: >-
+      {{ ((_ra_distro_dnf_repolist.stdout | default('')) is search('pacemaker-')
+          or (_ra_distro_zypper_repos.stdout | default('')) is search('pacemaker-')) | bool }}
+
+- name: Enable distribution High Availability repositories
+  ansible.builtin.include_tasks: enable-ha-repo.yml
+  when:
+    - not _ra_distro_linbit_repo
+    - ansible_facts['os_family'] | lower in ['redhat', 'suse']
+
+- name: Install distribution resource agents
+  ansible.builtin.include_tasks: "install-{{ ansible_facts['os_family'] | lower }}.yml"

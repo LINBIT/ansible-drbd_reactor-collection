@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: MIT
+---
+- name: Install distribution resource agents (APT)
+  ansible.builtin.apt:
+    name: "{{ resource_agents_distro_packages }}"
+    state: present
+    install_recommends: false
+    update_cache: true

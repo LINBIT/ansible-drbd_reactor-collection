@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: MIT
+---
+- name: Install distribution resource agents (DNF)
+  ansible.builtin.dnf:
+    name: "{{ resource_agents_distro_packages }}"
+    state: present
+    install_weak_deps: false

@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: MIT
+---
+# Ubuntu 24.04+ splits resource-agents into base, common, and extra packages
+resource_agents_distro_packages:
+  - resource-agents-base
+  - resource-agents-common
+  - resource-agents-extra

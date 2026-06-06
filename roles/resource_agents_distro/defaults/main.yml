@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: MIT
+---
+# defaults file for resource_agents_distro
+
+resource_agents_distro_packages:
+  - resource-agents
+
+resource_agents_distro_sle_ha_regcode: ""

@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: MIT
+---
+- name: Install distribution resource agents (Zypper)
+  community.general.zypper:
+    name: "{{ resource_agents_distro_packages }}"
+    state: present
+    disable_recommends: true

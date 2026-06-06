@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: MIT
+---
+minor_changes:
+  - >
+    resource_agents_distro - new role to install the distribution
+    ``resource-agents`` package with weak dependencies disabled, enabling the
+    per-distribution High Availability repository (AlmaLinux/Rocky
+    ``ha``/``highavailability``, Oracle Linux ``addons``, Red Hat Enterprise
+    Linux HA Add-On, SLES HA extension) and deferring to LINBIT pacemaker
+    repositories when present.
+  - >
+    drbd_reactor - declare ``community.general`` as a collection dependency for
+    the ``community.general.zypper`` module used by ``resource_agents_distro``
+    on SUSE family hosts.
