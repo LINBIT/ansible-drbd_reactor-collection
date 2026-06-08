@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: MIT
+---
+bugfixes:
+  - >
+    reactor_install, resource_agents_upstream - gather minimal OS facts
+    when they are not already present, so the roles work when invoked with
+    tag filters that skip the implicit fact-gathering task or under
+    ``gather_facts: false``.
