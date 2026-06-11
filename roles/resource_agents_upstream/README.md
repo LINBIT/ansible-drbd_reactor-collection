@@ -28,6 +28,14 @@ On subsequent runs, the role uses this marker to distinguish its own downloads f
 | RA exists with marker, different version | Re-download and update marker |
 | RA exists without marker | System-installed RA, leave untouched |
 
+The `resource_agents_upstream_version` variable accepts any Git ref: a release tag, a branch name, or a commit SHA.
+Release tags and commit SHAs are immutable, so marker-matched agents are skipped as already current.
+Branch names (for example `main`) are moving refs, so marker-matched agents are re-downloaded on every run and upstream branch changes always land.
+
+Agents in `resource_agents_upstream_list` that do not exist in the selected version are skipped with a warning instead of failing the role.
+This lets one agent list work across old release tags and branches.
+For example, `ganesha-nfs` is not yet part of any upstream release and installs only when the version is set to `main`.
+
 ## C helper binaries
 
 The role also compiles C helper binaries from source when they are not already present.
@@ -49,7 +57,7 @@ None.
 
 | Variable | Default | Description |
 |---|---|---|
-| `resource_agents_upstream_version` | `""` | Empty (default) fetches the latest upstream release; pin to a GitHub release tag (for example `v4.18.0`) for reproducibility |
+| `resource_agents_upstream_version` | `""` | Empty (default) fetches the latest upstream release; pin to a GitHub release tag (for example `v4.18.0`) or a commit SHA for reproducibility, or set a branch name (for example `main`) to track unreleased agents |
 | `resource_agents_upstream_list` | See defaults | List of OCF resource agent names to ensure are present |
 
 ### Default resource agents list
@@ -61,6 +69,7 @@ None.
 - [`iSCSILogicalUnit`](https://github.com/ClusterLabs/resource-agents/blob/main/heartbeat/iSCSILogicalUnit.in)
 - [`nfsserver`](https://github.com/ClusterLabs/resource-agents/blob/main/heartbeat/nfsserver)
 - [`exportfs`](https://github.com/ClusterLabs/resource-agents/blob/main/heartbeat/exportfs)
+- [`ganesha-nfs`](https://github.com/ClusterLabs/resource-agents/blob/main/heartbeat/ganesha-nfs)
 - [`nvmet-subsystem`](https://github.com/ClusterLabs/resource-agents/blob/main/heartbeat/nvmet-subsystem)
 - [`nvmet-namespace`](https://github.com/ClusterLabs/resource-agents/blob/main/heartbeat/nvmet-namespace)
 - [`nvmet-port`](https://github.com/ClusterLabs/resource-agents/blob/main/heartbeat/nvmet-port)
@@ -91,6 +100,30 @@ To pin to a specific version:
       vars:
         resource_agents_upstream_version: v4.18.0
 ```
+
+To track the upstream development branch (required for agents not yet in a release, such as `ganesha-nfs`):
+
+```yaml
+    - name: Install OCF resource agents from the main branch
+      ansible.builtin.import_role:
+        name: linbit.drbd_reactor.resource_agents_upstream
+      vars:
+        resource_agents_upstream_version: main
+```
+
+To pin a commit SHA, combining access to unreleased agents with reproducibility:
+
+```yaml
+    - name: Install OCF resource agents from a pinned commit
+      ansible.builtin.import_role:
+        name: linbit.drbd_reactor.resource_agents_upstream
+      vars:
+        # Full and short commit SHAs both accepted
+        resource_agents_upstream_version: 3d9213e6
+```
+
+The role installs the agent scripts only.
+Runtime daemons that an agent manages, such as `nfs-ganesha` for `ganesha-nfs`, must be installed separately.
 
 To install via `reactor_install` (enabled by default):
 

@@ -28,7 +28,7 @@
   changed_when: false
   failed_when: false
 
-# rc=0: our file (marker found) - check version
+# rc=0: our file (marker found) - check version, always refresh on a moving ref
 # rc=1: system file (exists, no marker) - leave alone
 # rc=2: file not found - needs download
 - name: Build list of resource agents to download
@@ -37,10 +37,14 @@
       {{ _ra_check.results
          | selectattr('rc', 'equalto', 2)
          | map(attribute='item') | list
-         + _ra_check.results
-           | selectattr('rc', 'equalto', 0)
-           | rejectattr('stdout', 'search', _ra_resolved_version)
-           | map(attribute='item') | list }}
+         + (_ra_check.results
+            | selectattr('rc', 'equalto', 0)
+            | map(attribute='item') | list
+            if _ra_version_mutable | bool
+            else _ra_check.results
+            | selectattr('rc', 'equalto', 0)
+            | rejectattr('stdout', 'search', _ra_resolved_version)
+            | map(attribute='item') | list) }}
 
 - name: Check OCF shell library version marker
   ansible.builtin.command:
@@ -53,7 +57,9 @@
   ansible.builtin.set_fact:
     _ra_lib_needs_download: >-
       {{ _ra_lib_check.rc == 2
-         or (_ra_lib_check.rc == 0 and _ra_resolved_version not in _ra_lib_check.stdout) }}
+         or (_ra_lib_check.rc == 0
+             and (_ra_version_mutable | bool
+                  or _ra_resolved_version not in _ra_lib_check.stdout)) }}
 
 # rc=0: our binary (stamp found) - check version
 # rc=1: system binary (exists, no stamp) - leave alone
@@ -79,10 +85,14 @@
       {{ _ra_helper_check.results
          | selectattr('rc', 'equalto', 2)
          | map(attribute='item') | list
-         + _ra_helper_check.results
-           | selectattr('rc', 'equalto', 0)
-           | rejectattr('stdout', 'search', _ra_resolved_version)
-           | map(attribute='item') | list }}
+         + (_ra_helper_check.results
+            | selectattr('rc', 'equalto', 0)
+            | map(attribute='item') | list
+            if _ra_version_mutable | bool
+            else _ra_helper_check.results
+            | selectattr('rc', 'equalto', 0)
+            | rejectattr('stdout', 'search', _ra_resolved_version)
+            | map(attribute='item') | list) }}
 
 - name: Build control-host fetch list from per-node requirements
   ansible.builtin.set_fact:
@@ -104,6 +114,15 @@
   ansible.builtin.include_tasks: fetch-agents.yml
   when: _ra_fetch_list | length > 0 or _ra_fetch_lib | bool or _ra_fetch_helpers | length > 0
   run_once: true # noqa: run-once[task]
+
+- name: Drop agents unavailable upstream from the per-node download list
+  ansible.builtin.set_fact:
+    _ra_to_download: "{{ _ra_to_download | difference(_ra_skipped) }}"
+  vars:
+    _ra_skipped: >-
+      {{ ansible_play_hosts | map('extract', hostvars)
+         | map(attribute='_ra_unavailable', default=[])
+         | flatten | unique }}
 
 - name: Distribute OCF resource agents to target nodes
   ansible.builtin.include_tasks: distribute-agents.yml

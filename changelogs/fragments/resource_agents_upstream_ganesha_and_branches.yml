@@ -1,0 +1,20 @@
+# SPDX-License-Identifier: MIT
+---
+minor_changes:
+  - >
+    resource_agents_upstream - add ``ganesha-nfs`` to the default agent
+    list. The agent is not yet part of an upstream release, so it installs
+    only when ``resource_agents_upstream_version`` is set to a branch name
+    (for example ``main``).
+  - >
+    resource_agents_upstream - accept branch names (for example ``main``)
+    and commit SHAs in ``resource_agents_upstream_version``. Branch names
+    are treated as moving refs, so previously installed agents, library
+    files, and C helpers are refreshed on every run instead of being
+    skipped on a version-marker match. Tags and commit SHAs stay
+    immutable and skip already-current files.
+  - >
+    resource_agents_upstream - skip agents that do not exist in the
+    selected resource-agents version with a warning instead of failing the
+    download. One agent list now works across old release tags and
+    branches.

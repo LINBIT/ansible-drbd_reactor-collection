@@ -1,6 +1,37 @@
 # SPDX-License-Identifier: MIT
 ---
 # All download tasks use 'throttle: 1' to keep GitHub rate limits in check
+- name: Check upstream availability of requested resource agents
+  ansible.builtin.uri:
+    url: >-
+      {{ _ra_github_raw_base }}/{{ _ra_resolved_version }}/heartbeat/{{ item }}{{ '.in'
+         if item in _ra_templates else '' }}
+    method: HEAD
+    status_code: [200, 404]
+  delegate_to: localhost
+  become: false
+  loop: "{{ _ra_fetch_list }}"
+  register: _ra_availability
+  until: _ra_availability is succeeded
+  retries: 3
+  delay: 10
+  throttle: 1
+
+- name: Build list of agents unavailable in this resource-agents version
+  ansible.builtin.set_fact:
+    _ra_unavailable: >-
+      {{ _ra_availability.results
+         | selectattr('status', 'equalto', 404)
+         | map(attribute='item') | list }}
+
+- name: Warn about skipped resource agents
+  ansible.builtin.debug:
+    msg: >-
+      Skipping {{ _ra_unavailable | join(', ') }}: not present in
+      ClusterLabs/resource-agents {{ _ra_resolved_version }}. Use a newer
+      release tag or a branch name (for example main) to install them.
+  when: _ra_unavailable | length > 0
+
 - name: Create control host cache directories
   ansible.builtin.file:
     path: "{{ _ra_control_cache }}/{{ _ra_resolved_version }}/{{ item }}"
@@ -20,9 +51,10 @@
          if item in _ra_templates else '' }}
     dest: "{{ _ra_control_cache }}/{{ _ra_resolved_version }}/heartbeat/{{ item }}"
     mode: "0644"
+    force: "{{ _ra_version_mutable | bool }}"
   delegate_to: localhost
   become: false
-  loop: "{{ _ra_fetch_list }}"
+  loop: "{{ _ra_fetch_list | difference(_ra_unavailable) }}"
   register: _ra_cache_download
   until: _ra_cache_download is succeeded
   retries: 3
@@ -34,6 +66,7 @@
     url: "{{ _ra_github_raw_base }}/{{ _ra_resolved_version }}/heartbeat/{{ item }}.in"
     dest: "{{ _ra_control_cache }}/{{ _ra_resolved_version }}/lib/{{ item }}"
     mode: "0644"
+    force: "{{ _ra_version_mutable | bool }}"
   when: _ra_fetch_lib | bool
   delegate_to: localhost
   become: false
@@ -49,6 +82,7 @@
     url: "{{ _ra_github_raw_base }}/{{ _ra_resolved_version }}/heartbeat/{{ item }}"
     dest: "{{ _ra_control_cache }}/{{ _ra_resolved_version }}/lib/{{ item }}"
     mode: "0644"
+    force: "{{ _ra_version_mutable | bool }}"
   when: _ra_fetch_lib | bool
   delegate_to: localhost
   become: false
@@ -64,6 +98,7 @@
     url: "{{ _ra_github_raw_base }}/{{ _ra_resolved_version }}/tools/{{ _ra_helper_sources[item] }}"
     dest: "{{ _ra_control_cache }}/{{ _ra_resolved_version }}/tools/{{ _ra_helper_sources[item] }}"
     mode: "0644"
+    force: "{{ _ra_version_mutable | bool }}"
   delegate_to: localhost
   become: false
   loop: "{{ _ra_fetch_helpers }}"

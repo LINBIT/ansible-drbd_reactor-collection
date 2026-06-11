@@ -22,6 +22,12 @@ _ra_version: >-
      else (lookup('ansible.builtin.url', _ra_github_api, split_lines=false)
            | from_json).tag_name }}
 
+# Release tags (vX.Y.Z) and commit SHAs are immutable - anything else (master,
+# main) is a moving ref, so marker-matched files still get refreshed every run
+_ra_version_mutable: >-
+  {{ not (_ra_resolved_version is match('^v[0-9]')
+          or _ra_resolved_version is match('^[0-9a-fA-F]{7,40}$')) }}
+
 # RAs that exist as .in autoconf templates on GitHub (need @BASH_SHELL@ substitution)
 _ra_templates:
   - iSCSITarget

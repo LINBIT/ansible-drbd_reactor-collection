@@ -2,7 +2,7 @@
 ---
 # defaults file for resource_agents_upstream
 
-# GitHub release tag - empty string (default) fetches the latest release
+# GitHub release tag or branch name - empty string (default) fetches the latest release
 resource_agents_upstream_version: ""
 
 # List of OCF resource agents to ensure are present
@@ -14,6 +14,7 @@ resource_agents_upstream_list:
   - iSCSILogicalUnit
   - nfsserver
   - exportfs
+  - ganesha-nfs
   - nvmet-subsystem
   - nvmet-namespace
   - nvmet-port

@@ -11,8 +11,12 @@ argument_specs:
         type: str
         default: ""
         description:
-          - GitHub release tag to download (for example C(v4.18.0)).
+          - Git ref to download, accepting a release tag (for example C(v4.18.0)),
+            a branch name (for example C(main)), or a commit SHA.
           - Empty string (default) fetches the latest release from upstream.
+          - Branch names are treated as moving refs, so previously installed agents
+            are refreshed on every run. Tags and commit SHAs are immutable and skip
+            already-current agents.
       resource_agents_upstream_list:
         type: list
         elements: str
@@ -24,11 +28,13 @@ argument_specs:
           - iSCSILogicalUnit
           - nfsserver
           - exportfs
+          - ganesha-nfs
           - nvmet-subsystem
           - nvmet-namespace
           - nvmet-port
         description:
           - List of OCF resource agent names to ensure are present.
+          - Agents not present in the selected version are skipped with a warning instead of failing the role.
           - C helper binaries are compiled automatically based on this list.
           - C(IPaddr2) pulls in C(send_arp) for gratuitous ARP on takeover.
           - C(portblock) pulls in C(tickle_tcp) for TCP tickling to drop stale sessions.
