@@ -48,7 +48,7 @@ None.
 | Debian, Proxmox VE, Ubuntu 22.04 and earlier | `resource-agents` | Default repositories |
 | Ubuntu 24.04 and later | `resource-agents-base` | Default repositories; [`IPaddr2`](https://github.com/ClusterLabs/resource-agents/blob/main/heartbeat/IPaddr2) moved to a separate package |
 | Red Hat 8/9 family with LINBIT customer repos | `resource-agents` | Included in the LINBIT `drbd-9` or `pacemaker-2` customer repository |
-| Red Hat 10 family with LINBIT customer repos | `resource-agents` | Included in the LINBIT `pacemaker-3` customer repository (not yet in `drbd-9`) |
+| Red Hat 10 family with LINBIT customer repos | `resource-agents` | Included in the LINBIT `pacemaker-3` customer repository |
 | Red Hat (without LINBIT repos) | `resource-agents` | Requires the HA Add-On subscription (`highavailability-rpms`) |
 | AlmaLinux, Rocky Linux | `resource-agents` | Requires enabling the `ha` (EL8) or `highavailability` (EL9+) repository |
 | Oracle Linux | `resource-agents` | Requires enabling the `addons` repository |
