@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: MIT
+---
+scst_install_build_packages:
+  - '@Development tools'
+  - perl
+  - perl-Data-Dumper
+  - perl-ExtUtils-MakeMaker
+  - rpm-build
+  - dkms

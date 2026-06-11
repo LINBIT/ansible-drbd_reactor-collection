@@ -1,0 +1,56 @@
+# SPDX-License-Identifier: MIT
+---
+- name: Install EPEL on Oracle Linux (DNF)
+  ansible.builtin.dnf:
+    name: "oracle-epel-release-el{{ ansible_facts['distribution_major_version'] }}"
+    state: present
+  when: ansible_facts['distribution'] | lower == 'oraclelinux'
+  register: _scst_epel_oracle
+  until: _scst_epel_oracle is succeeded
+  retries: 3
+  delay: 10
+
+- name: Install EPEL on other RPM distros (DNF)
+  ansible.builtin.dnf:
+    name: epel-release
+    state: present
+  when: ansible_facts['distribution'] | lower != 'oraclelinux'
+  register: _scst_epel
+  until: _scst_epel is succeeded
+  retries: 3
+  delay: 10
+
+- name: Install SCST build prerequisites (RHEL)
+  ansible.builtin.package:
+    name: "{{ scst_install_build_packages }}"
+    state: present
+  register: _scst_build_packages
+  until: _scst_build_packages is succeeded
+  retries: 3
+  delay: 10
+
+- name: Compile SCST RPMs
+  ansible.builtin.command:
+    cmd: make rpm-dkms
+    chdir: /tmp/scst
+    creates: /usr/src/packages/RPMS/x86_64/scst-dkms-*.rpm
+
+- name: Find SCST debug RPMs
+  ansible.builtin.find:
+    paths: /usr/src/packages/RPMS/x86_64
+    patterns: '*debug*'
+  register: _scst_debug_rpms
+
+- name: Remove SCST debug RPMs before install
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ _scst_debug_rpms.files }}"
+  loop_control:
+    label: "{{ item.path }}"
+
+- name: Install SCST RPMs
+  ansible.builtin.shell: |
+    dnf install -y /usr/src/packages/RPMS/x86_64/scst*.rpm
+  register: scst_rpm_install
+  changed_when: "'Nothing to do' not in scst_rpm_install.stdout"

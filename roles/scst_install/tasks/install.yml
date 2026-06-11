@@ -42,6 +42,10 @@
         state: present
       delegate_to: "{{ _scst_fetch_host }}"
       run_once: true  # noqa: run-once[task]
+      register: _scst_git_install
+      until: _scst_git_install is succeeded
+      retries: 3
+      delay: 10
 
     - name: Checkout SCST repo on the fetch host
       ansible.builtin.git:  # noqa: latest[git]
@@ -50,6 +54,10 @@
         dest: /tmp/scst
       delegate_to: "{{ _scst_fetch_host }}"
       run_once: true  # noqa: run-once[task]
+      register: _scst_checkout
+      until: _scst_checkout is succeeded
+      retries: 3
+      delay: 10
 
     - name: Package SCST source on the fetch host
       community.general.archive:
@@ -75,6 +83,10 @@
       ansible.builtin.package:
         name: tar
         state: present
+      register: _scst_tar_install
+      until: _scst_tar_install is succeeded
+      retries: 3
+      delay: 10
 
     - name: Unpack SCST source from the control host cache
       ansible.builtin.unarchive:
@@ -85,95 +97,27 @@
       ansible.builtin.package:
         name: "{{ ansible_facts | linbit.common.dkms_kernel_headers }}"
         state: present
+      register: _scst_kernel_headers
+      until: _scst_kernel_headers is succeeded
+      retries: 3
+      delay: 10
+
+    - name: Load OS-specific build variables
+      ansible.builtin.include_vars: "{{ item }}"
+      with_first_found:
+        - files:
+            - "{{ ansible_facts['os_family'] | lower }}.yml"
+          paths:
+            - "{{ role_path }}/vars"
+          skip: true
 
     - name: Build and install SCST (RHEL)
+      ansible.builtin.include_tasks: install-redhat.yml
       when: ansible_facts['os_family'] | lower == 'redhat'
-      block:
-        - name: Install EPEL on Oracle Linux (DNF)
-          ansible.builtin.dnf:
-            name: "oracle-epel-release-el{{ ansible_facts['distribution_major_version'] }}"
-            state: present
-          when: ansible_facts['distribution'] | lower == 'oraclelinux'
-
-        - name: Install EPEL on other RPM distros (DNF)
-          ansible.builtin.dnf:
-            name: epel-release
-            state: present
-          when: ansible_facts['distribution'] | lower != 'oraclelinux'
-
-        - name: Install SCST build prerequisites (RHEL)
-          ansible.builtin.package:
-            name:
-              - '@Development tools'
-              - perl
-              - perl-Data-Dumper
-              - perl-ExtUtils-MakeMaker
-              - rpm-build
-              - dkms
-            state: present
-
-        - name: Compile SCST RPMs
-          ansible.builtin.command:
-            cmd: make rpm-dkms
-            chdir: /tmp/scst
-            creates: /usr/src/packages/RPMS/x86_64/scst-dkms-*.rpm
-
-        - name: Find SCST debug RPMs
-          ansible.builtin.find:
-            paths: /usr/src/packages/RPMS/x86_64
-            patterns: '*debug*'
-          register: _scst_debug_rpms
-
-        - name: Remove SCST debug RPMs before install
-          ansible.builtin.file:
-            path: "{{ item.path }}"
-            state: absent
-          loop: "{{ _scst_debug_rpms.files }}"
-          loop_control:
-            label: "{{ item.path }}"
-
-        - name: Install SCST RPMs
-          ansible.builtin.shell: |
-            dnf install -y /usr/src/packages/RPMS/x86_64/scst*.rpm
-          register: scst_rpm_install
-          changed_when: "'Nothing to do' not in scst_rpm_install.stdout"
 
     - name: Build and install SCST (Debian)
+      ansible.builtin.include_tasks: install-debian.yml
       when: ansible_facts['os_family'] | lower == 'debian'
-      block:
-        - name: Install SCST build prerequisites (Debian)
-          ansible.builtin.package:
-            name:
-              - build-essential
-              - debhelper
-              - devscripts
-              - dkms
-              - gcc
-              - make
-              - lintian
-              - quilt
-            state: present
-
-        - name: Prepare SCST release tree (Debian)
-          ansible.builtin.command:
-            cmd: make 2release
-            chdir: /tmp/scst
-          changed_when: true
-
-        - name: Compile SCST .deb packages
-          ansible.builtin.command:
-            cmd: make dpkg
-            chdir: /tmp/scst
-          changed_when: true
-
-        - name: Install SCST .deb packages
-          ansible.builtin.shell: |
-            dpkg -i /tmp/scst/dpkg/iscsi-scst_*.deb
-            dpkg -i /tmp/scst/dpkg/scstadmin_*.deb
-            dpkg -i /tmp/scst/dpkg/scst-dev_*.deb
-            dpkg -i /tmp/scst/dpkg/scst-dkms_*.deb
-          register: scst_deb_install
-          changed_when: "'already installed' not in scst_deb_install.stderr"
 
     - name: Remove SCST build directory
       ansible.builtin.file:

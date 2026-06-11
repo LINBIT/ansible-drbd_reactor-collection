@@ -1,0 +1,31 @@
+# SPDX-License-Identifier: MIT
+---
+- name: Install SCST build prerequisites (Debian)
+  ansible.builtin.package:
+    name: "{{ scst_install_build_packages }}"
+    state: present
+  register: _scst_build_packages
+  until: _scst_build_packages is succeeded
+  retries: 3
+  delay: 10
+
+- name: Prepare SCST release tree (Debian)
+  ansible.builtin.command:
+    cmd: make 2release
+    chdir: /tmp/scst
+  changed_when: true
+
+- name: Compile SCST .deb packages
+  ansible.builtin.command:
+    cmd: make dpkg
+    chdir: /tmp/scst
+  changed_when: true
+
+- name: Install SCST .deb packages
+  ansible.builtin.shell: |
+    dpkg -i /tmp/scst/dpkg/iscsi-scst_*.deb
+    dpkg -i /tmp/scst/dpkg/scstadmin_*.deb
+    dpkg -i /tmp/scst/dpkg/scst-dev_*.deb
+    dpkg -i /tmp/scst/dpkg/scst-dkms_*.deb
+  register: scst_deb_install
+  changed_when: "'already installed' not in scst_deb_install.stderr"
