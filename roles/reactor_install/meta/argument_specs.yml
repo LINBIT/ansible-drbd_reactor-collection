@@ -7,6 +7,15 @@ argument_specs:
       - Install and configure DRBD Reactor.
       - Includes C(linbit.drbd.drbd_install) by default to install DRBD.
     options:
+      reactor_install_package_state:
+        type: str
+        default: present
+        choices:
+          - latest
+          - present
+        description:
+          - Package state for the DRBD Reactor package.
+          - Set C(latest) to check for upgrades.
       reactor_install_drbd:
         type: bool
         default: true

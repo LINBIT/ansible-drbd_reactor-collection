@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: MIT
 ---
 # defaults file for reactor_install
+reactor_install_package_state: present
 reactor_install_drbd: true
 reactor_install_resource_agents_upstream: true
 reactor_install_scst: false

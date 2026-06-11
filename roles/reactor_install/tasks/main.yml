@@ -36,7 +36,7 @@
 - name: Install DRBD Reactor
   ansible.builtin.package:
     name: "{{ reactor_install_packages }}"
-    state: present
+    state: "{{ reactor_install_package_state }}"
   register: _reactor_install_packages
 
 - name: Start and enable DRBD Reactor

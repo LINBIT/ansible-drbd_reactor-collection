@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: MIT
+---
+minor_changes:
+  - >
+    reactor_install - add ``reactor_install_package_state`` (default
+    ``present``) to control the DRBD Reactor package state. Set ``latest``
+    to upgrade an already-installed package on re-runs, matching the
+    ``*_package_state`` variables in the other LINBIT install roles.

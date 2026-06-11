@@ -10,6 +10,7 @@ None.
 
 | Variable | Default | Description |
 |---|---|---|
+| `reactor_install_package_state` | `present` | Package state for the DRBD Reactor package; set `latest` to check for upgrades |
 | `reactor_install_drbd` | `true` | Include `linbit.drbd.drbd_install` to install DRBD; set `false` when DRBD is already managed by a calling role (for example `satellite_install`) |
 | `reactor_install_resource_agents_upstream` | `true` | Include `resource_agents_upstream` role to install missing OCF resource agents from GitHub |
 | `reactor_install_scst` | `false` | Include `scst_install` role to compile and install the SCST iSCSI target from source |
