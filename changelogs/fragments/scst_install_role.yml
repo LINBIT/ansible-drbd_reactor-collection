@@ -6,7 +6,8 @@ minor_changes:
     from source with DKMS, moved from ``linbit.linstor.gateway_satellite``.
     The source is fetched once on an elected node, cached on the control
     host, and distributed to the remaining nodes. Usable standalone, without
-    DRBD Reactor or LINSTOR.
+    DRBD Reactor or LINSTOR. With the default unpinned version, a failed
+    release build automatically retries from the ``master`` branch.
   - >
     reactor_install - new ``reactor_install_scst`` option (default
     ``false``) includes the ``scst_install`` role, mirroring

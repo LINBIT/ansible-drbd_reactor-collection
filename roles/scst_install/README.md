@@ -21,9 +21,8 @@ EPEL provides `dkms` on Enterprise Linux, and the role enables it during the bui
 |---|---|---|
 | `scst_install_version` | `""` | Empty resolves the latest SCST release tag (see [releases](https://github.com/SCST-project/scst/releases)); or pin a tag, branch, or commit SHA |
 
-By default the latest SCST release is built (`v3.10` today).
-Its RPM build fails on newer Enterprise Linux kernels (EL9.8+, EL10), so on those nodes set `scst_install_version: master` until SCST 3.11 is released.
-The Debian packaging of the same release carries kernel-compatibility patches, so it builds on newer Debian and Ubuntu kernels (for example Debian 13 on 6.12 and Ubuntu 24.04 on 6.8).
+By default the latest SCST release is built, with an automatic fallback that retries the build from the `master` branch when the release fails to build (kernels newer than the release supports, for example).
+Pinning `scst_install_version` disables the fallback and fails on a broken build.
 
 ## Dependencies
 

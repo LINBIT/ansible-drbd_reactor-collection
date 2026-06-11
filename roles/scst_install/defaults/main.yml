@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: MIT
 ---
 # defaults file for scst_install
-# Empty resolves the latest SCST release tag; or pin a tag, branch, or SHA
-# Newer EL kernels (EL9.8+, EL10) need 'master' until SCST 3.11 - see README
+# Empty resolves the latest SCST release tag and falls back to a master
+# branch build when the release fails to build - pinning a tag, branch, or
+# SHA disables the fallback
 scst_install_version: ""

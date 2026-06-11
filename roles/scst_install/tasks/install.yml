@@ -24,105 +24,61 @@
          | default(ansible_play_hosts | first) }}
   run_once: true  # noqa: run-once[task]
 
-- name: Fetch SCST source once to the control host cache
+- name: Resolve SCST version on the control host
+  ansible.builtin.set_fact:
+    _scst_resolved_version: >-
+      {{ scst_install_version
+         if scst_install_version | length > 0
+         else (lookup('ansible.builtin.url', scst_install_github_api, split_lines=false)
+             | from_json).tag_name }}
+  run_once: true  # noqa: run-once[task]
   when: _scst_any_needed | bool
+
+- name: Build SCST with a master branch fallback
   block:
-    - name: Resolve SCST version on the control host
-      ansible.builtin.set_fact:
-        _scst_resolved_version: >-
-          {{ scst_install_version
-             if scst_install_version | length > 0
-             else (lookup('ansible.builtin.url', scst_install_github_api, split_lines=false)
-                 | from_json).tag_name }}
-      run_once: true  # noqa: run-once[task]
+    - name: Build SCST from the resolved version
+      ansible.builtin.include_tasks: build.yml
+      vars:
+        _scst_build_version: "{{ _scst_resolved_version }}"
+  rescue:
+    - name: Fail when a pinned SCST version does not build
+      ansible.builtin.fail:
+        msg: >-
+          SCST {{ scst_install_version }} failed to build; no fallback for a
+          pinned scst_install_version
+      when: scst_install_version | length > 0
 
-    - name: Install git on the SCST fetch host
-      ansible.builtin.package:
-        name: git
-        state: present
-      delegate_to: "{{ _scst_fetch_host }}"
-      run_once: true  # noqa: run-once[task]
-      register: _scst_git_install
-      until: _scst_git_install is succeeded
-      retries: 3
-      delay: 10
+    - name: Announce the master branch fallback
+      ansible.builtin.debug:
+        msg: >-
+          SCST {{ _scst_resolved_version }} failed to build; retrying from the
+          master branch (the master build can also fail)
 
-    - name: Checkout SCST repo on the fetch host
-      ansible.builtin.git:  # noqa: latest[git]
-        repo: "https://github.com/{{ scst_install_github_repo }}.git"
-        version: "{{ _scst_resolved_version }}"
-        dest: /tmp/scst
-      delegate_to: "{{ _scst_fetch_host }}"
-      run_once: true  # noqa: run-once[task]
-      register: _scst_checkout
-      until: _scst_checkout is succeeded
-      retries: 3
-      delay: 10
-
-    - name: Package SCST source on the fetch host
-      community.general.archive:
-        path: /tmp/scst
-        dest: /tmp/scst.tar.gz
-        format: gz
-        mode: '0644'
-      delegate_to: "{{ _scst_fetch_host }}"
-      run_once: true  # noqa: run-once[task]
-
-    - name: Cache SCST source archive on the control host
-      ansible.builtin.fetch:
-        src: /tmp/scst.tar.gz
-        dest: "{{ scst_install_cache }}/{{ _scst_resolved_version }}.tar.gz"
-        flat: true
-      delegate_to: "{{ _scst_fetch_host }}"
-      run_once: true  # noqa: run-once[task]
-
-- name: Build and install SCST from source
-  when: _scst_needs_install | bool
-  block:
-    - name: Install tar for SCST source extraction
-      ansible.builtin.package:
-        name: tar
-        state: present
-      register: _scst_tar_install
-      until: _scst_tar_install is succeeded
-      retries: 3
-      delay: 10
-
-    - name: Unpack SCST source from the control host cache
-      ansible.builtin.unarchive:
-        src: "{{ scst_install_cache }}/{{ _scst_resolved_version }}.tar.gz"
-        dest: /tmp
-
-    - name: Install kernel headers for SCST DKMS
-      ansible.builtin.package:
-        name: "{{ ansible_facts | linbit.common.dkms_kernel_headers }}"
-        state: present
-      register: _scst_kernel_headers
-      until: _scst_kernel_headers is succeeded
-      retries: 3
-      delay: 10
-
-    - name: Load OS-specific build variables
-      ansible.builtin.include_vars: "{{ item }}"
-      with_first_found:
-        - files:
-            - "{{ ansible_facts['os_family'] | lower }}.yml"
-          paths:
-            - "{{ role_path }}/vars"
-          skip: true
-
-    - name: Build and install SCST (RHEL)
-      ansible.builtin.include_tasks: install-redhat.yml
-      when: ansible_facts['os_family'] | lower == 'redhat'
-
-    - name: Build and install SCST (Debian)
-      ansible.builtin.include_tasks: install-debian.yml
-      when: ansible_facts['os_family'] | lower == 'debian'
-
-    - name: Remove SCST build directory
+    - name: Remove the failed build tree
       ansible.builtin.file:
         path: /tmp/scst
         state: absent
+
+    - name: Find stale SCST RPMs from the failed build
+      ansible.builtin.find:
+        paths: /usr/src/packages/RPMS/x86_64
+        patterns: 'scst*.rpm'
+      register: _scst_stale_rpms
+      when: ansible_facts['os_family'] | lower == 'redhat'
+
+    - name: Remove stale SCST RPMs from the failed build
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ _scst_stale_rpms.files | default([]) }}"
+      loop_control:
+        label: "{{ item.path }}"
+      when: ansible_facts['os_family'] | lower == 'redhat'
+
+    - name: Build SCST from the master branch
+      ansible.builtin.include_tasks: build.yml
+      vars:
+        _scst_build_version: master
 
 # https://github.com/LINBIT/linstor-gateway/issues/24#issuecomment-1800271696
 - name: Load SCST kernel modules

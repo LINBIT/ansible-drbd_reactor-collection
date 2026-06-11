@@ -14,5 +14,8 @@ argument_specs:
         default: ""
         description:
           - SCST git reference to build - a tag, branch, or commit SHA.
-          - Empty string (default) resolves the latest SCST release tag.
-          - Newer Enterprise Linux kernels (EL9.8+, EL10) need C(master) until SCST 3.11 is released.
+          - >-
+            Empty string (default) resolves the latest SCST release tag and
+            falls back to a C(master) branch build when the release fails to
+            build (kernels newer than the release supports, for example).
+          - Pinning a reference disables the fallback and fails on a broken build.
