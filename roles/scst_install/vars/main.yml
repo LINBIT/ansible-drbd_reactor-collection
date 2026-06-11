@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: MIT
+---
+# Control node cache for the SCST source, fetched once then distributed to nodes
+scst_install_cache: /tmp/linbit-scst
+
+scst_install_github_repo: SCST-project/scst
+scst_install_github_api: "https://api.github.com/repos/{{ scst_install_github_repo }}/releases/latest"

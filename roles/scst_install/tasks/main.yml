@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: MIT
+---
+# tasks file for scst_install
+- name: Gather OS facts for OS-specific install steps
+  ansible.builtin.setup:
+    gather_subset:
+      - "!all"
+      - min
+  when: ansible_facts['os_family'] is not defined
+
+# install.yml stays a dynamic include so the offline CI lint never parses
+# its community.general module references
+- name: Install SCST from source
+  ansible.builtin.include_tasks: install.yml

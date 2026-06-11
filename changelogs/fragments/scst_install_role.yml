@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: MIT
+---
+minor_changes:
+  - >
+    scst_install - new role that compiles and installs the SCST iSCSI target
+    from source with DKMS, moved from ``linbit.linstor.gateway_satellite``.
+    The source is fetched once on an elected node, cached on the control
+    host, and distributed to the remaining nodes. Usable standalone, without
+    DRBD Reactor or LINSTOR.
+  - >
+    reactor_install - new ``reactor_install_scst`` option (default
+    ``false``) includes the ``scst_install`` role, mirroring
+    ``reactor_install_resource_agents_upstream``.

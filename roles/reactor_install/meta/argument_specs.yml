@@ -19,3 +19,9 @@ argument_specs:
         description:
           - Include C(linbit.drbd_reactor.resource_agents_upstream) to install missing OCF resource agents from GitHub.
           - Useful on distributions where the C(resource-agents) package is missing or incomplete.
+      reactor_install_scst:
+        type: bool
+        default: false
+        description:
+          - Include C(linbit.drbd_reactor.scst_install) to compile and install the SCST iSCSI target from source.
+          - Pin the SCST git reference with C(scst_install_version) when needed.

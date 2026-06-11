@@ -1,0 +1,18 @@
+# SPDX-License-Identifier: MIT
+---
+argument_specs:
+  main:
+    short_description: Compile and install the SCST iSCSI target from source
+    description:
+      - Build and install the SCST iSCSI target from source with DKMS.
+      - The source is fetched once on a single node, cached on the Ansible control host, and distributed to the remaining nodes from the cache.
+      - Supports the RedHat and Debian OS families.
+      - Upstream repo - U(https://github.com/SCST-project/scst).
+    options:
+      scst_install_version:
+        type: str
+        default: ""
+        description:
+          - SCST git reference to build - a tag, branch, or commit SHA.
+          - Empty string (default) resolves the latest SCST release tag.
+          - Newer Enterprise Linux kernels (EL9.8+, EL10) need C(master) until SCST 3.11 is released.
