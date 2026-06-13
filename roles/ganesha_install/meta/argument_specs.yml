@@ -1,0 +1,28 @@
+# SPDX-License-Identifier: MIT
+---
+argument_specs:
+  main:
+    short_description: Install the NFS-Ganesha userspace NFS server
+    description:
+      - Install the NFS-Ganesha userspace NFS server packages, including the VFS FSAL.
+      - The C(nfs-ganesha.service) systemd unit is stopped and disabled because the C(ganesha-nfs) OCF resource agent runs the daemon directly.
+      - Supports the Debian family and Enterprise Linux 9 or later.
+      - On Enterprise Linux, packages come from the CentOS Storage SIG repository, which the role configures.
+    options:
+      ganesha_install_package_state:
+        type: str
+        default: present
+        choices:
+          - latest
+          - present
+        description:
+          - Package state for the NFS-Ganesha packages.
+          - Set C(latest) to check for upgrades.
+      ganesha_install_sig_version:
+        type: str
+        default: ""
+        description:
+          - CentOS Storage SIG NFS-Ganesha repository version to configure on Enterprise Linux.
+          - Empty string (default) resolves the latest version published for the node's major release.
+          - Pin a version (for example C(7)) to override. The minimum is C(4), where the NFSv4 recovery directory options required for HA failover were added.
+          - Ignored on the Debian family, where the distribution repositories provide the packages.

@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: MIT
+---
+# defaults file for ganesha_install
+ganesha_install_package_state: present
+
+# CentOS Storage SIG repository version (EL only) - empty resolves the latest, pin to override
+ganesha_install_sig_version: ""

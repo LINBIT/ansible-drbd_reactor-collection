@@ -40,6 +40,7 @@ See [using Ansible collections](https://docs.ansible.com/ansible/latest/collecti
 
 | Role | Description |
 |---|---|
+| [`ganesha_install`](roles/ganesha_install/README.md) | Install the NFS-Ganesha userspace NFS server, configuring the CentOS Storage SIG repository on Enterprise Linux. |
 | [`reactor_install`](roles/reactor_install/README.md) | Install and enable DRBD Reactor with automatic config reloading. Dynamically includes `linbit.drbd.drbd_install` if DRBD is not already present on the node. |
 | [`resource_agents_distro`](roles/resource_agents_distro/README.md) | Install the distribution `resource-agents` package, enabling the OS-appropriate High Availability repository where one is required. |
 | [`resource_agents_upstream`](roles/resource_agents_upstream/README.md) | Download missing OCF resource agents from the ClusterLabs GitHub repository. Only agents not already present on the system are downloaded. |

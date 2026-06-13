@@ -1,0 +1,53 @@
+# SPDX-License-Identifier: MIT
+---
+# tasks file for ganesha_install
+- name: Gather OS facts for OS-specific install steps
+  ansible.builtin.setup:
+    gather_subset:
+      - "!all"
+      - min
+  when: ansible_facts['os_family'] is not defined
+
+- name: Verify the distribution can install NFS-Ganesha
+  ansible.builtin.assert:
+    that:
+      - ansible_facts['os_family'] | lower in ['debian', 'redhat']
+      - ansible_facts['os_family'] | lower != 'redhat'
+        or ansible_facts['distribution_major_version'] | int >= 9
+      - ansible_facts['distribution'] | lower != 'ubuntu'
+        or ansible_facts['distribution_major_version'] | int >= 24
+    fail_msg: >-
+      NFS-Ganesha installation is not supported on
+      {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_version'] }}.
+      Supported distributions are Debian 12 or later, Ubuntu 24.04 or later,
+      and Enterprise Linux 9 or later. Older releases package NFS-Ganesha 3.x,
+      which cannot place NFSv4 recovery state on a replicated volume, and the
+      EL8 CentOS Storage SIG repositories are no longer published.
+
+- name: Load OS-specific variables
+  ansible.builtin.include_vars: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_facts['os_family'] | lower }}.yml"
+      paths:
+        - "{{ role_path }}/vars"
+
+- name: Configure the NFS-Ganesha package repository (RedHat)
+  ansible.builtin.include_tasks: repo-redhat.yml
+  when: ansible_facts['os_family'] | lower == 'redhat'
+
+- name: Install NFS-Ganesha packages
+  ansible.builtin.package:
+    name: "{{ ganesha_install_packages }}"
+    state: "{{ ganesha_install_package_state }}"
+  register: _ganesha_install_packages
+  until: _ganesha_install_packages is succeeded
+  retries: 3
+  delay: 10
+
+# The ganesha-nfs OCF resource agent execs ganesha.nfsd directly
+- name: Stop and disable the NFS-Ganesha service
+  ansible.builtin.systemd_service:
+    name: nfs-ganesha.service
+    state: stopped
+    enabled: false

@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: MIT
+---
+ganesha_install_packages:
+  - nfs-ganesha
+  - nfs-ganesha-vfs
+
+# CentOS Storage SIG repository
+_ganesha_sig_listing: >-
+  https://mirror.stream.centos.org/SIGs/{{ ansible_facts['distribution_major_version']
+  }}-stream/storage/{{ ansible_facts['architecture'] }}/
+_ganesha_sig_baseurl: "https://mirror.stream.centos.org/SIGs/$releasever-stream/storage/$basearch/nfsganesha-{{ _ganesha_sig_version }}/"
+_ganesha_sig_gpgkey: https://www.centos.org/keys/RPM-GPG-KEY-CentOS-SIG-Storage

@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: MIT
+---
+minor_changes:
+  - >
+    ganesha_install - new role that installs the NFS-Ganesha userspace NFS
+    server and its VFS FSAL, configuring the CentOS Storage SIG repository
+    on Enterprise Linux. The ``nfs-ganesha.service`` unit is stopped and
+    disabled because the ``ganesha-nfs`` OCF resource agent runs the daemon
+    directly. Include from ``reactor_install`` with
+    ``reactor_install_ganesha: true``.

@@ -34,3 +34,9 @@ argument_specs:
         description:
           - Include C(linbit.drbd_reactor.scst_install) to compile and install the SCST iSCSI target from source.
           - Pin the SCST git reference with C(scst_install_version) when needed.
+      reactor_install_ganesha:
+        type: bool
+        default: false
+        description:
+          - Include C(linbit.drbd_reactor.ganesha_install) to install the NFS-Ganesha userspace NFS server.
+          - Pin the CentOS Storage SIG repository version on Enterprise Linux with C(ganesha_install_sig_version) when needed.

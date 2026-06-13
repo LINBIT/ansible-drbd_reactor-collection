@@ -1,0 +1,56 @@
+# SPDX-License-Identifier: MIT
+---
+# NFS-Ganesha 4.0 added RecoveryDir/RecoveryRoot, required for HA failover
+- name: Verify the pinned repository version is 4 or later
+  ansible.builtin.assert:
+    that:
+      - ganesha_install_sig_version | length == 0
+        or ganesha_install_sig_version | int >= 4
+    fail_msg: >-
+      ganesha_install_sig_version {{ ganesha_install_sig_version }} installs
+      NFS-Ganesha 3.x, which cannot place NFSv4 recovery state on a replicated
+      volume. Pin version 4 or later, or leave empty to resolve the latest.
+
+- name: List the CentOS Storage SIG NFS-Ganesha repository versions
+  ansible.builtin.uri:
+    url: "{{ _ganesha_sig_listing }}"
+    return_content: true
+  when: ganesha_install_sig_version | length == 0
+  register: _ganesha_sig_index
+  until: _ganesha_sig_index is succeeded
+  retries: 3
+  delay: 10
+
+# Staging repositories publish metadata before packages
+- name: Check candidate repositories for the NFS-Ganesha package
+  ansible.builtin.uri:
+    url: "{{ _ganesha_sig_listing }}nfsganesha-{{ item }}/Packages/n/"
+    return_content: true
+    status_code: [200, 404]
+  when: ganesha_install_sig_version | length == 0
+  loop: >-
+    {{ _ganesha_sig_index.content | default('')
+       | regex_findall('nfsganesha-([0-9]+)/')
+       | map('int') | unique | sort(reverse=true) }}
+  register: _ganesha_sig_checks
+  until: _ganesha_sig_checks is succeeded
+  retries: 3
+  delay: 10
+
+- name: Set the CentOS Storage SIG NFS-Ganesha repository version
+  ansible.builtin.set_fact:
+    _ganesha_sig_version: >-
+      {{ ganesha_install_sig_version
+         if ganesha_install_sig_version | length > 0
+         else _ganesha_sig_checks.results
+         | selectattr('content', 'defined')
+         | selectattr('content', 'search', 'nfs-ganesha-[0-9]')
+         | map(attribute='item') | max }}
+
+- name: Configure the CentOS Storage SIG NFS-Ganesha repository (DNF)
+  ansible.builtin.yum_repository:
+    name: centos-nfs-ganesha
+    description: "CentOS Storage SIG NFS-Ganesha {{ _ganesha_sig_version }}"
+    baseurl: "{{ _ganesha_sig_baseurl }}"
+    gpgcheck: true
+    gpgkey: "{{ _ganesha_sig_gpgkey }}"
