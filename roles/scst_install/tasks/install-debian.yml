@@ -7,7 +7,6 @@
   register: _scst_build_packages
   until: _scst_build_packages is succeeded
   retries: 3
-  delay: 10
 
 - name: Prepare SCST release tree (Debian)
   ansible.builtin.command:

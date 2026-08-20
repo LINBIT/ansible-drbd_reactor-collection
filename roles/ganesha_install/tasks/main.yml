@@ -43,7 +43,6 @@
   register: _ganesha_install_packages
   until: _ganesha_install_packages is succeeded
   retries: 3
-  delay: 10
 
 # The ganesha-nfs OCF resource agent execs ganesha.nfsd directly
 - name: Stop and disable the NFS-Ganesha service

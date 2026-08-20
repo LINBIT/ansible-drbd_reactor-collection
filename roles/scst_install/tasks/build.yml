@@ -14,7 +14,6 @@
       register: _scst_git_install
       until: _scst_git_install is succeeded
       retries: 3
-      delay: 10
 
     - name: Checkout SCST repo on the fetch host
       ansible.builtin.git:  # noqa: latest[git]
@@ -55,7 +54,6 @@
       register: _scst_tar_install
       until: _scst_tar_install is succeeded
       retries: 3
-      delay: 10
 
     - name: Unpack SCST source from the control host cache
       ansible.builtin.unarchive:
@@ -69,7 +67,6 @@
       register: _scst_kernel_headers
       until: _scst_kernel_headers is succeeded
       retries: 3
-      delay: 10
 
     - name: Load OS-specific build variables
       ansible.builtin.include_vars: "{{ item }}"

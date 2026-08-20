@@ -6,6 +6,9 @@
   ansible.builtin.package:
     name: gcc
     state: present
+  register: _ra_gcc_install
+  until: _ra_gcc_install is succeeded
+  retries: 3
 
 - name: Create heartbeat binary directory
   ansible.builtin.file:

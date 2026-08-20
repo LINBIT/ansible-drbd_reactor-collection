@@ -14,6 +14,9 @@
     name: gawk
     state: present
   when: ansible_facts['os_family'] | lower == 'debian'
+  register: _ra_gawk_install
+  until: _ra_gawk_install is succeeded
+  retries: 3
 
 - name: Resolve upstream resource-agents version on the control host
   ansible.builtin.set_fact:

@@ -6,3 +6,6 @@
     state: present
     install_recommends: false
     update_cache: true
+  register: _resource_agents_distro_install
+  until: _resource_agents_distro_install is succeeded
+  retries: 3

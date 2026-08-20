@@ -5,3 +5,6 @@
     name: "{{ resource_agents_distro_packages }}"
     state: present
     disable_recommends: true
+  register: _resource_agents_distro_install
+  until: _resource_agents_distro_install is succeeded
+  retries: 3
