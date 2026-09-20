@@ -1,7 +1,5 @@
 # SPDX-License-Identifier: MIT
 ---
-drbd_reactor_examples_dir: '/usr/share/doc/drbd-reactor'
-
 # OCF have_binary() calls /bin/which; ship it so stripped images still work.
 reactor_install_packages:
   - drbd-reactor

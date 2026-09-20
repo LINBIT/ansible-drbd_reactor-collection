@@ -53,12 +53,16 @@
     enabled: true
 
 # https://github.com/LINBIT/drbd-reactor?tab=readme-ov-file#automatic-reload
+# Bundled copies of the upstream example units - the package ships them as docs, which minimal images strip
+# When docs are installed, the packaged copies also exist at:
+#   Debian: /usr/share/doc/drbd-reactor/examples/
+#   RedHat: /usr/share/doc/drbd-reactor/
+#   SUSE:   /usr/share/doc/packages/drbd-reactor/
 - name: Enable automatic reload for DRBD Reactor
   ansible.builtin.copy:
-    src: "{{ drbd_reactor_examples_dir }}/{{ item }}"
+    src: "{{ item }}"
     dest: "/etc/systemd/system/{{ item }}"
     mode: '0644'
-    remote_src: true
   with_items:
     - 'drbd-reactor-reload.path'
     - 'drbd-reactor-reload.service'
