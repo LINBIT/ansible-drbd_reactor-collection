@@ -6,3 +6,14 @@ reactor_install_drbd: true
 reactor_install_resource_agents_upstream: true
 reactor_install_scst: false
 reactor_install_ganesha: false
+
+# The Prometheus exporter plugin only listens once a [[prometheus]] section
+# exists in the DRBD Reactor config, so the port stays closed by default
+reactor_install_prometheus: false
+reactor_install_firewall_rules: true
+
+# firewalld zone for the ports below. Empty uses the default zone
+reactor_install_firewalld_zone: ""
+
+reactor_install_firewall_ports:
+  - { port: '9942', proto: tcp, zone: "{{ reactor_install_firewalld_zone }}" }

@@ -52,6 +52,12 @@
     state: started
     enabled: true
 
+- name: Open firewall ports for the DRBD Reactor Prometheus exporter
+  ansible.builtin.include_tasks: open-firewall.yml
+  when:
+    - reactor_install_prometheus | bool
+    - reactor_install_firewall_rules | bool
+
 # https://github.com/LINBIT/drbd-reactor?tab=readme-ov-file#automatic-reload
 # Bundled copies of the upstream example units - the package ships them as docs, which minimal images strip
 # When docs are installed, the packaged copies also exist at:

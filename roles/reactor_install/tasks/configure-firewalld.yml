@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: MIT
+---
+- name: Open firewalld ports for the DRBD Reactor Prometheus exporter
+  ansible.posix.firewalld:
+    port: "{{ item.port }}/{{ item.proto }}"
+    zone: "{{ item.zone | default(omit, true) }}"
+    permanent: true
+    immediate: true
+    state: enabled
+  loop: "{{ reactor_install_firewall_ports }}"
