@@ -16,9 +16,9 @@
 
 - name: Compile SCST .deb packages
   ansible.builtin.command:
-    cmd: make dpkg
+    cmd: make -j{{ ansible_facts['processor_vcpus'] }} dpkg
     chdir: /tmp/scst
-  changed_when: true
+    creates: /tmp/scst/dpkg/scst-dkms_*.deb
 
 - name: Install SCST .deb packages
   ansible.builtin.shell: |

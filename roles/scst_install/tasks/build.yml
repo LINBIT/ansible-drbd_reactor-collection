@@ -68,6 +68,13 @@
       until: _scst_kernel_headers is succeeded
       retries: 3
 
+    - name: Gather hardware facts for the parallel SCST build
+      ansible.builtin.setup:
+        gather_subset:
+          - "!all"
+          - hardware
+      when: ansible_facts['processor_vcpus'] is not defined
+
     - name: Load OS-specific build variables
       ansible.builtin.include_vars: "{{ item }}"
       with_first_found:

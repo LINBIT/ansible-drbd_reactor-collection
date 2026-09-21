@@ -28,7 +28,7 @@
 
 - name: Compile SCST RPMs
   ansible.builtin.command:
-    cmd: make rpm-dkms
+    cmd: make -j{{ ansible_facts['processor_vcpus'] }} rpm-dkms
     chdir: /tmp/scst
     creates: /usr/src/packages/RPMS/x86_64/scst-dkms-*.rpm
 

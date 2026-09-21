@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: MIT
+---
+minor_changes:
+  - >
+    scst_install - compile SCST with ``make -j<processor_vcpus>`` on both the
+    Red Hat and Debian OS families instead of a single job. The Red Hat
+    ``rpm-dkms`` build compiles the full module set inside ``rpmbuild``, which
+    inherits ``MAKEFLAGS`` from the role, so the build now scales with the
+    node's core count. The role gathers the ``hardware`` fact subset itself
+    when ``processor_vcpus`` is missing.
+bugfixes:
+  - >
+    scst_install - guard the Debian package build with ``creates``, matching
+    the Red Hat build. A re-run after a run that compiled successfully but
+    failed later, during package installation or module loading, no longer
+    recompiles SCST from scratch.
