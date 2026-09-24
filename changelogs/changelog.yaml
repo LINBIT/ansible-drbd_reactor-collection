@@ -17,3 +17,69 @@ releases:
     fragments:
       - release_summary.yml
     release_date: '2026-05-21'
+  0.9.9:
+    changes:
+      breaking_changes:
+        - resource_agents_upstream - download the upstream files from GitHub on the
+          Ansible control node and copy them to the target nodes. The control node now
+          needs GitHub access and the target nodes no longer do. This avoids GitHub rate limits
+          on larger clusters.
+        - resource_agents_upstream - the default ``resource_agents_upstream_version``
+          is now the latest upstream release instead of ``v4.16.0``. Set it to ``v4.16.0``
+          to keep the previous version.
+      bugfixes:
+        - reactor_install - ship the drbd-reactor-reload units with the role. Enabling
+          automatic reload no longer fails on minimal or nodocs installs that strip
+          the package documentation directory.
+        - 'reactor_install, resource_agents_upstream - gather minimal OS facts when
+          they are missing, so the roles work under ``gather_facts: false`` or with
+          tag filters that skip fact gathering.'
+        - resource_agents_upstream - install ``gawk`` on the Debian OS family. Without
+          it, ``IPaddr2`` failed to start because ``findif.sh`` needs gawk extensions
+          that ``mawk`` lacks.
+      minor_changes:
+        - Documentation - rewrite the collection and role READMEs, and point the Galaxy
+          repository, documentation, and issue links at the public GitHub repository.
+        - The collection now depends on ``community.general`` for the SUSE package
+          tasks in ``resource_agents_distro``.
+        - 'ganesha_install - new role that installs the NFS-Ganesha userspace NFS
+          server for the ``ganesha-nfs`` OCF resource agent. Include it from ``reactor_install``
+          with ``reactor_install_ganesha: true``.'
+        - reactor_install - add ``reactor_install_package_state`` (default ``present``).
+          Set it to ``latest`` to upgrade DRBD Reactor on reruns.
+        - 'reactor_install - set ``reactor_install_prometheus: true`` to open the
+          DRBD Reactor Prometheus exporter port (9942/tcp) in the host firewall. Choose
+          the firewalld zone with ``reactor_install_firewalld_zone``, or skip firewall
+          handling with ``reactor_install_firewall_rules: false``.'
+        - reactor_install, resource_agents_upstream - add Ubuntu 26.04 to the supported
+          platforms and drop SLES 15 releases older than SP4, which are out of support.
+        - reactor_install, resource_agents_upstream - retry package installation up
+          to three times so transient repository failures do not fail the role.
+        - resource_agents_distro - new role that installs the distribution ``resource-agents``
+          package and enables the High Availability repository it needs on each distribution.
+        - resource_agents_upstream - ``resource_agents_upstream_version`` accepts
+          branch names and commit SHAs. Files installed from a branch are refreshed on every run.
+        - resource_agents_upstream - add ``ganesha-nfs`` to the default agent list.
+          It is not in an upstream release yet, so it installs only when the version
+          is a branch such as ``main``.
+        - resource_agents_upstream - skip agents missing from the selected version
+          with a warning instead of failing, so one agent list works across versions.
+        - 'scst_install - new role, moved from ``linbit.linstor.gateway_satellite``,
+          that builds and installs the SCST iSCSI target from source with DKMS. It
+          works standalone, without DRBD Reactor or LINSTOR. Include it from ``reactor_install``
+          with ``reactor_install_scst: true``.'
+    fragments:
+      - docs.yml
+      - ganesha_install_role.yml
+      - gather_facts_guard.yml
+      - package-install-retries.yml
+      - platforms.yml
+      - reactor-install-bundled-reload-units.yml
+      - reactor_install_package_state.yml
+      - reactor_install_prometheus_port.yml
+      - resource_agents_distro.yml
+      - resource_agents_upstream_control_host_cache.yml
+      - resource_agents_upstream_ganesha_and_branches.yml
+      - resource_agents_upstream_gawk_debian.yml
+      - scst_install_role.yml
+    release_date: '2026-09-24'

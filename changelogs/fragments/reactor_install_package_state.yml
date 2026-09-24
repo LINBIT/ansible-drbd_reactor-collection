@@ -1,6 +1,0 @@
-# SPDX-License-Identifier: MIT
----
-minor_changes:
-  - >-
-    reactor_install - add ``reactor_install_package_state`` (default ``present``).
-    Set it to ``latest`` to upgrade DRBD Reactor on reruns.

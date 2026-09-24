@@ -1,6 +1,0 @@
-# SPDX-License-Identifier: MIT
----
-minor_changes:
-  - >-
-    reactor_install, resource_agents_upstream - add Ubuntu 26.04 to the supported
-    platforms and drop SLES 15 releases older than SP4, which are out of support.

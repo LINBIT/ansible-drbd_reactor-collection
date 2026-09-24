@@ -1,8 +1,0 @@
-# SPDX-License-Identifier: MIT
----
-minor_changes:
-  - >-
-    reactor_install - set ``reactor_install_prometheus: true`` to open the DRBD
-    Reactor Prometheus exporter port (9942/tcp) in the host firewall. Choose the
-    firewalld zone with ``reactor_install_firewalld_zone``, or skip firewall
-    handling with ``reactor_install_firewall_rules: false``.
