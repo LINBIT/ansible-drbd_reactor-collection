@@ -1,7 +1,6 @@
+# SPDX-License-Identifier: MIT
 ---
 minor_changes:
-  - reactor_install, resource_agents_distro, resource_agents_upstream - retry
-    package installation tasks up to three times so transient package
-    repository failures do not fail the role.
-  - ganesha_install, scst_install - use the default retry delay on package
-    installation tasks for consistency across collections.
+  - >-
+    reactor_install, resource_agents_upstream - retry package installation up to
+    three times so transient repository failures do not fail the role.

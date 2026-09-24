@@ -1,8 +1,7 @@
 # SPDX-License-Identifier: MIT
 ---
 bugfixes:
-  - reactor_install - ship the drbd-reactor-reload path and service units
-    with the role instead of copying them from the package documentation
-    directory. Minimal images and nodocs installs strip that directory, so
-    enabling automatic reload failed with "Source not found" even though
-    drbd-reactor itself installed fine.
+  - >-
+    reactor_install - ship the drbd-reactor-reload units with the role. Enabling
+    automatic reload no longer fails on minimal or nodocs installs that strip the
+    package documentation directory.
