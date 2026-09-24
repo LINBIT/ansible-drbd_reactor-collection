@@ -6,7 +6,7 @@ Compile and install the [SCST](https://github.com/SCST-project/scst) iSCSI targe
 
 - SCST is skipped entirely on nodes where the `scst` kernel module is already loaded.
 - One node that needs SCST is elected as the fetch host; it clones the SCST repository once.
-- The source archive is cached on the Ansible control host at `/tmp/linbit-scst/<version>.tar.gz`, then distributed to the remaining nodes, avoiding repeated GitHub clones in larger clusters.
+- The source archive is cached on the Ansible control node at `/tmp/linbit-scst/<version>.tar.gz`, then distributed to the remaining nodes, avoiding repeated GitHub clones in larger clusters.
 - Each node builds and installs SCST packages with DKMS, so the module survives kernel updates.
 - The `scst`, `iscsi-scst`, and `scst_vdisk` kernel modules are loaded persistently, and an `iscsi-scst.service` unit is created, started, and enabled.
 

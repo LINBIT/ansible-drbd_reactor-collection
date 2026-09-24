@@ -32,7 +32,7 @@
       release tag or a branch name (for example main) to install them.
   when: _ra_unavailable | length > 0
 
-- name: Create control host cache directories
+- name: Create control node cache directories
   ansible.builtin.file:
     path: "{{ _ra_control_cache }}/{{ _ra_resolved_version }}/{{ item }}"
     state: directory
@@ -44,7 +44,7 @@
     - lib
     - tools
 
-- name: Download resource agents to the control host cache
+- name: Download resource agents to the control node cache
   ansible.builtin.get_url:
     url: >-
       {{ _ra_github_raw_base }}/{{ _ra_resolved_version }}/heartbeat/{{ item }}{{ '.in'
@@ -61,7 +61,7 @@
   delay: 10
   throttle: 1
 
-- name: Download OCF shell library template files to the control host cache
+- name: Download OCF shell library template files to the control node cache
   ansible.builtin.get_url:
     url: "{{ _ra_github_raw_base }}/{{ _ra_resolved_version }}/heartbeat/{{ item }}.in"
     dest: "{{ _ra_control_cache }}/{{ _ra_resolved_version }}/lib/{{ item }}"
@@ -77,7 +77,7 @@
   delay: 10
   throttle: 1
 
-- name: Download OCF shell library plain files to the control host cache
+- name: Download OCF shell library plain files to the control node cache
   ansible.builtin.get_url:
     url: "{{ _ra_github_raw_base }}/{{ _ra_resolved_version }}/heartbeat/{{ item }}"
     dest: "{{ _ra_control_cache }}/{{ _ra_resolved_version }}/lib/{{ item }}"
@@ -93,7 +93,7 @@
   delay: 10
   throttle: 1
 
-- name: Download C helper sources to the control host cache
+- name: Download C helper sources to the control node cache
   ansible.builtin.get_url:
     url: "{{ _ra_github_raw_base }}/{{ _ra_resolved_version }}/tools/{{ _ra_helper_sources[item] }}"
     dest: "{{ _ra_control_cache }}/{{ _ra_resolved_version }}/tools/{{ _ra_helper_sources[item] }}"

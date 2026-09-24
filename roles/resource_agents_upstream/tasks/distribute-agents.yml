@@ -6,7 +6,7 @@
     state: directory
     mode: "0755"
 
-- name: Copy resource agents from the control host cache
+- name: Copy resource agents from the control node cache
   ansible.builtin.copy:
     src: "{{ _ra_control_cache }}/{{ _ra_resolved_version }}/heartbeat/{{ item }}"
     dest: "{{ _ra_base_dir }}/{{ item }}"
@@ -45,7 +45,7 @@
     mode: "0644"
   when: _ra_lib_needs_download | bool
 
-- name: Copy OCF shell library template files from the control host cache
+- name: Copy OCF shell library template files from the control node cache
   ansible.builtin.copy:
     src: "{{ _ra_control_cache }}/{{ _ra_resolved_version }}/lib/{{ item }}"
     dest: "{{ _ra_lib_base_dir }}/{{ item }}"
@@ -53,7 +53,7 @@
   when: _ra_lib_needs_download | bool
   loop: "{{ _ra_lib_templates }}"
 
-- name: Copy OCF shell library plain files from the control host cache
+- name: Copy OCF shell library plain files from the control node cache
   ansible.builtin.copy:
     src: "{{ _ra_control_cache }}/{{ _ra_resolved_version }}/lib/{{ item }}"
     dest: "{{ _ra_lib_base_dir }}/{{ item }}"

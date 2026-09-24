@@ -16,7 +16,7 @@
     state: directory
     mode: "0755"
 
-- name: Copy C helper sources from the control host cache
+- name: Copy C helper sources from the control node cache
   ansible.builtin.copy:
     src: "{{ _ra_control_cache }}/{{ _ra_resolved_version }}/tools/{{ _ra_helper_sources[item] }}"
     dest: "/tmp/{{ _ra_helper_sources[item] }}"

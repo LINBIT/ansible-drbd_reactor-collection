@@ -2,7 +2,7 @@
 ---
 # Fetch and build one SCST git reference (_scst_build_version)
 
-- name: Fetch SCST source once to the control host cache
+- name: Fetch SCST source once to the control node cache
   when: _scst_any_needed | bool
   block:
     - name: Install git on the SCST fetch host
@@ -36,7 +36,7 @@
       delegate_to: "{{ _scst_fetch_host }}"
       run_once: true  # noqa: run-once[task]
 
-    - name: Cache SCST source archive on the control host
+    - name: Cache SCST source archive on the control node
       ansible.builtin.fetch:
         src: /tmp/scst.tar.gz
         dest: "{{ scst_install_cache }}/{{ _scst_build_version }}.tar.gz"
@@ -55,7 +55,7 @@
       until: _scst_tar_install is succeeded
       retries: 3
 
-    - name: Unpack SCST source from the control host cache
+    - name: Unpack SCST source from the control node cache
       ansible.builtin.unarchive:
         src: "{{ scst_install_cache }}/{{ _scst_build_version }}.tar.gz"
         dest: /tmp

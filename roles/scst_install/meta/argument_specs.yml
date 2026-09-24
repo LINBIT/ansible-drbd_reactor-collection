@@ -5,7 +5,7 @@ argument_specs:
     short_description: Compile and install the SCST iSCSI target from source
     description:
       - Build and install the SCST iSCSI target from source with DKMS.
-      - The source is fetched once on a single node, cached on the Ansible control host, and distributed to the remaining nodes from the cache.
+      - The source is fetched once on a single node, cached on the Ansible control node, and distributed to the remaining nodes from the cache.
       - Supports the RedHat and Debian OS families.
       - Upstream repo - U(https://github.com/SCST-project/scst).
     options:

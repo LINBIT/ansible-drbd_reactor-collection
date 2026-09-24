@@ -18,7 +18,7 @@
   until: _ra_gawk_install is succeeded
   retries: 3
 
-- name: Resolve upstream resource-agents version on the control host
+- name: Resolve upstream resource-agents version on the control node
   ansible.builtin.set_fact:
     _ra_resolved_version: "{{ _ra_version }}"
   run_once: true # noqa: run-once[task]
@@ -97,7 +97,7 @@
             | rejectattr('stdout', 'search', _ra_resolved_version)
             | map(attribute='item') | list) }}
 
-- name: Build control-host fetch list from per-node requirements
+- name: Build control node fetch list from per-node requirements
   ansible.builtin.set_fact:
     _ra_fetch_list: >-
       {{ ansible_play_hosts | map('extract', hostvars)
@@ -113,7 +113,7 @@
          | flatten | unique }}
   run_once: true # noqa: run-once[task]
 
-- name: Fetch resource agents to the control host cache
+- name: Fetch resource agents to the control node cache
   ansible.builtin.include_tasks: fetch-agents.yml
   when: _ra_fetch_list | length > 0 or _ra_fetch_lib | bool or _ra_fetch_helpers | length > 0
   run_once: true # noqa: run-once[task]

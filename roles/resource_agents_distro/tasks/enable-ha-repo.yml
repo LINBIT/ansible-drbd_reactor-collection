@@ -25,7 +25,7 @@
     msg: >-
       Could not enable the Red Hat High Availability Add-On repository. Register the
       system with an entitlement that includes the High Availability Add-On, or
-      configure LINBIT pacemaker repositories, then re-run.
+      configure LINBIT pacemaker repositories, then rerun.
   when:
     - ansible_facts['distribution'] == 'RedHat'
     - _ra_distro_rhel_ha.rc != 0
@@ -45,7 +45,7 @@
     msg: >-
       Could not activate the SUSE Linux Enterprise High Availability extension. Set
       resource_agents_distro_sle_ha_regcode, register the system with SUSEConnect, or
-      configure LINBIT pacemaker repositories, then re-run.
+      configure LINBIT pacemaker repositories, then rerun.
   when:
     - ansible_facts['distribution'] == 'SLES'
     - _ra_distro_sles_ha.rc != 0

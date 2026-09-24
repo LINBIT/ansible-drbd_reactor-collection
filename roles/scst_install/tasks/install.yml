@@ -24,7 +24,7 @@
          | default(ansible_play_hosts | first) }}
   run_once: true  # noqa: run-once[task]
 
-- name: Resolve SCST version on the control host
+- name: Resolve SCST version on the control node
   ansible.builtin.set_fact:
     _scst_resolved_version: >-
       {{ scst_install_version
