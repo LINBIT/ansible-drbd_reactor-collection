@@ -16,20 +16,29 @@
     state: directory
     mode: "0755"
 
+- name: Create the C helper build directory
+  ansible.builtin.file:
+    path: /tmp/ra-helpers
+    state: directory
+    mode: "0755"
+
 - name: Copy C helper sources from the control node cache
   ansible.builtin.copy:
-    src: "{{ _ra_control_cache }}/{{ _ra_resolved_version }}/tools/{{ _ra_helper_sources[item] }}"
-    dest: "/tmp/{{ _ra_helper_sources[item] }}"
+    src: "{{ _ra_control_cache }}/{{ _ra_resolved_version }}/{{ item }}"
+    dest: "/tmp/ra-helpers/{{ item | basename }}"
     mode: "0644"
-  loop: "{{ _ra_helpers_to_compile }}"
+  loop: "{{ _ra_helpers_to_compile | map('extract', _ra_helper_sources) | flatten | unique }}"
 
+# send_ua's IPv6addr.h includes the autoconf config.h, which the helpers do not need
 - name: Compile and stamp C helper binaries
   ansible.builtin.shell:
     cmd: |
       set -e
+      cd /tmp/ra-helpers
+      : > config.h
       {% for helper in _ra_helpers_to_compile %}
-      gcc -O2 -o {{ _ra_bin_dir }}/{{ helper }} /tmp/{{ _ra_helper_sources[helper] }}
+      gcc -O2 -I. -o {{ _ra_bin_dir }}/{{ helper }} {{ _ra_helper_sources[helper] | select('search', '[.]c$') | map('basename') | join(' ') }}
       echo '{{ _ra_resolved_version }}' > {{ _ra_bin_dir }}/.{{ helper }}.version
-      rm -f /tmp/{{ _ra_helper_sources[helper] }}
       {% endfor %}
+      rm -rf /tmp/ra-helpers
   changed_when: true

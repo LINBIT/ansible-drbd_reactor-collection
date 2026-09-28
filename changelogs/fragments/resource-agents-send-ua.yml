@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: MIT
+---
+bugfixes:
+  - >-
+    resource_agents_upstream - build the ``send_ua`` helper along with
+    ``send_arp`` for ``IPaddr2``. ``IPaddr2`` uses it to wait for IPv6
+    duplicate address detection and to announce an IPv6 address after
+    takeover, so services that bind to the address start reliably.

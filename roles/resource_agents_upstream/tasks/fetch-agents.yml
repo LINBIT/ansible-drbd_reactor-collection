@@ -41,6 +41,7 @@
   become: false
   loop:
     - heartbeat
+    - include
     - lib
     - tools
 
@@ -95,13 +96,13 @@
 
 - name: Download C helper sources to the control node cache
   ansible.builtin.get_url:
-    url: "{{ _ra_github_raw_base }}/{{ _ra_resolved_version }}/tools/{{ _ra_helper_sources[item] }}"
-    dest: "{{ _ra_control_cache }}/{{ _ra_resolved_version }}/tools/{{ _ra_helper_sources[item] }}"
+    url: "{{ _ra_github_raw_base }}/{{ _ra_resolved_version }}/{{ item }}"
+    dest: "{{ _ra_control_cache }}/{{ _ra_resolved_version }}/{{ item }}"
     mode: "0644"
     force: "{{ _ra_version_mutable | bool }}"
   delegate_to: localhost
   become: false
-  loop: "{{ _ra_fetch_helpers }}"
+  loop: "{{ _ra_fetch_helpers | map('extract', _ra_helper_sources) | flatten | unique }}"
   register: _ra_cache_helper
   until: _ra_cache_helper is succeeded
   retries: 3

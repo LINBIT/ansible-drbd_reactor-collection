@@ -43,7 +43,7 @@ Which helpers are compiled depends on the contents of `resource_agents_upstream_
 
 | Resource agent | C helper | Purpose |
 |---|---|---|
-| `IPaddr2` | `send_arp` | Gratuitous ARP announcement after IP takeover |
+| `IPaddr2` | `send_arp`, `send_ua` | Gratuitous ARP, or an IPv6 unsolicited neighbor advertisement, after IP takeover |
 | `portblock` | `tickle_tcp` | TCP connection tickling to drop stale sessions after failover |
 
 The role installs `gcc` and compiles helpers only when an agent in `resource_agents_upstream_list` needs one (currently only `IPaddr2` or `portblock`).
