@@ -54,7 +54,7 @@ argument_specs:
         description:
           - Manage firewall rules for the DRBD Reactor Prometheus exporter port.
           - Set C(false) to skip firewall configuration.
-          - Has no effect unless C(reactor_install_prometheus) is also set.
+          - Has no effect unless O(reactor_install_prometheus) is also set.
       reactor_install_firewalld_zone:
         type: str
         default: ""
