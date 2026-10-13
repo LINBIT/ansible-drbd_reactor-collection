@@ -1,8 +1,0 @@
-# SPDX-License-Identifier: MIT
----
-bugfixes:
-  - >-
-    reactor_install - install ``which`` on SUSE, as on Red Hat. The OCF
-    resource agents look up their commands with ``which``, so every agent
-    failed to start without it, for example on the openSUSE Leap 16.0 cloud
-    image.

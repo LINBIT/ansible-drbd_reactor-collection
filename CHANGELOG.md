@@ -2,16 +2,27 @@
 
 **Topics**
 
+- <a href="#v0-9-10">v0\.9\.10</a>
+    - <a href="#bugfixes">Bugfixes</a>
 - <a href="#v0-9-9">v0\.9\.9</a>
     - <a href="#minor-changes">Minor Changes</a>
     - <a href="#breaking-changes--porting-guide">Breaking Changes / Porting Guide</a>
-    - <a href="#bugfixes">Bugfixes</a>
+    - <a href="#bugfixes-1">Bugfixes</a>
 - <a href="#v0-9-8">v0\.9\.8</a>
     - <a href="#release-summary">Release Summary</a>
 - <a href="#v0-9-7">v0\.9\.7</a>
     - <a href="#release-summary-1">Release Summary</a>
 
 This changelog describes changes after version 0\.9\.6\.
+
+<a id="v0-9-10"></a>
+## v0\.9\.10
+
+<a id="bugfixes"></a>
+### Bugfixes
+
+* reactor\_install \- install <code>which</code> on SUSE\, as on Red Hat\. The OCF resource agents look up their commands with <code>which</code>\, so every agent failed to start without it\, for example on the openSUSE Leap 16\.0 cloud image\.
+* resource\_agents\_upstream \- build the <code>send\_ua</code> helper along with <code>send\_arp</code> for <code>IPaddr2</code>\. <code>IPaddr2</code> uses it to wait for IPv6 duplicate address detection and to announce an IPv6 address after takeover\, so services that bind to the address start reliably\.
 
 <a id="v0-9-9"></a>
 ## v0\.9\.9
@@ -38,7 +49,7 @@ This changelog describes changes after version 0\.9\.6\.
 * resource\_agents\_upstream \- download the upstream files from GitHub on the Ansible control node and copy them to the target nodes\. The control node now needs GitHub access and the target nodes no longer do\. This avoids GitHub rate limits on larger clusters\.
 * resource\_agents\_upstream \- the default <code>resource\_agents\_upstream\_version</code> is now the latest upstream release instead of <code>v4\.16\.0</code>\. Set it to <code>v4\.16\.0</code> to keep the previous version\.
 
-<a id="bugfixes"></a>
+<a id="bugfixes-1"></a>
 ### Bugfixes
 
 * reactor\_install \- ship the drbd\-reactor\-reload units with the role\. Enabling automatic reload no longer fails on minimal or nodocs installs that strip the package documentation directory\.

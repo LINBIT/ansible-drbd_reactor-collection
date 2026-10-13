@@ -21,9 +21,9 @@ releases:
     changes:
       breaking_changes:
         - resource_agents_upstream - download the upstream files from GitHub on the
-          Ansible control node and copy them to the target nodes. The control node now
-          needs GitHub access and the target nodes no longer do. This avoids GitHub rate limits
-          on larger clusters.
+          Ansible control node and copy them to the target nodes. The control node
+          now needs GitHub access and the target nodes no longer do. This avoids GitHub
+          rate limits on larger clusters.
         - resource_agents_upstream - the default ``resource_agents_upstream_version``
           is now the latest upstream release instead of ``v4.16.0``. Set it to ``v4.16.0``
           to keep the previous version.
@@ -58,7 +58,8 @@ releases:
         - resource_agents_distro - new role that installs the distribution ``resource-agents``
           package and enables the High Availability repository it needs on each distribution.
         - resource_agents_upstream - ``resource_agents_upstream_version`` accepts
-          branch names and commit SHAs. Files installed from a branch are refreshed on every run.
+          branch names and commit SHAs. Files installed from a branch are refreshed
+          on every run.
         - resource_agents_upstream - add ``ganesha-nfs`` to the default agent list.
           It is not in an upstream release yet, so it installs only when the version
           is a branch such as ``main``.
@@ -83,3 +84,17 @@ releases:
       - resource_agents_upstream_gawk_debian.yml
       - scst_install_role.yml
     release_date: '2026-09-24'
+  0.9.10:
+    changes:
+      bugfixes:
+        - reactor_install - install ``which`` on SUSE, as on Red Hat. The OCF resource
+          agents look up their commands with ``which``, so every agent failed to start
+          without it, for example on the openSUSE Leap 16.0 cloud image.
+        - resource_agents_upstream - build the ``send_ua`` helper along with ``send_arp``
+          for ``IPaddr2``. ``IPaddr2`` uses it to wait for IPv6 duplicate address
+          detection and to announce an IPv6 address after takeover, so services that
+          bind to the address start reliably.
+    fragments:
+      - reactor-install-suse-which.yml
+      - resource-agents-send-ua.yml
+    release_date: '2026-10-13'
