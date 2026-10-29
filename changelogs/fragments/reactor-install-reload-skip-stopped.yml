@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: MIT
+---
+bugfixes:
+  - reactor_install - the bundled drbd-reactor-reload service now runs
+    "systemctl try-reload-or-restart" instead of "systemctl reload", in line
+    with recent upstream DRBD Reactor changes. A config change in
+    /etc/drbd-reactor.d while drbd-reactor was stopped, as during the
+    linbit.linstor.ha_database conversion, left drbd-reactor-reload.service
+    failed on every node.
