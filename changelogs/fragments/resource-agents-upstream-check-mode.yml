@@ -1,0 +1,6 @@
+# SPDX-License-Identifier: MIT
+---
+bugfixes:
+  - resource_agents_upstream - check mode failed with "object of type 'dict' has no attribute
+    'status'", because the read-only version checks and the upstream availability probe were
+    skipped. They now run in check mode too, so it computes the same agent lists as a real run.

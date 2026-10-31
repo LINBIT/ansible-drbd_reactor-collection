@@ -30,6 +30,7 @@
   register: _ra_check
   changed_when: false
   failed_when: false
+  check_mode: false
 
 # rc=0: our file (marker found) - check version, always refresh on a moving ref
 # rc=1: system file (exists, no marker) - leave alone
@@ -55,6 +56,7 @@
   register: _ra_lib_check
   changed_when: false
   failed_when: false
+  check_mode: false
 
 - name: Set OCF shell library download flag
   ansible.builtin.set_fact:
@@ -81,6 +83,7 @@
   register: _ra_helper_check
   changed_when: false
   failed_when: false
+  check_mode: false
 
 - name: Build list of C helpers to compile
   ansible.builtin.set_fact:

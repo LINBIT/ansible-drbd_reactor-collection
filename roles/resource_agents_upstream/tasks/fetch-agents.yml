@@ -16,6 +16,7 @@
   retries: 3
   delay: 10
   throttle: 1
+  check_mode: false
 
 - name: Build list of agents unavailable in this resource-agents version
   ansible.builtin.set_fact:
