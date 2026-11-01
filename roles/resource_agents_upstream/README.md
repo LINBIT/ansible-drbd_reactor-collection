@@ -132,7 +132,7 @@ To install via `reactor_install` (enabled by default):
       ansible.builtin.import_role:
         name: linbit.drbd_reactor.reactor_install
       vars:
-        reactor_install_resource_agents_upstream: true  # true by default
+        reactor_install_resource_agents: upstream  # the default
 ```
 
 ## Distribution availability of resource-agents

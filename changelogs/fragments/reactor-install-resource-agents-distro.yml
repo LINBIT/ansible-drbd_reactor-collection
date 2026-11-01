@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: MIT
+---
+breaking_changes:
+  - >-
+    reactor_install - ``reactor_install_resource_agents`` replaces the boolean
+    ``reactor_install_resource_agents_upstream``. It takes ``upstream`` (the default), ``distro``, which
+    includes the ``resource_agents_distro`` role to install the distribution ``resource-agents`` package,
+    or ``none``. Replace ``reactor_install_resource_agents_upstream: false`` with
+    ``reactor_install_resource_agents: none``.

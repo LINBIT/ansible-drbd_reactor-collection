@@ -22,12 +22,20 @@ argument_specs:
         description:
           - Include C(linbit.drbd.drbd_install) to install DRBD.
           - Set to C(false) when DRBD is already managed by a calling role.
-      reactor_install_resource_agents_upstream:
-        type: bool
-        default: true
+      reactor_install_resource_agents:
+        type: str
+        default: upstream
+        choices:
+          - upstream
+          - distro
+          - none
         description:
-          - Include C(linbit.drbd_reactor.resource_agents_upstream) to install missing OCF resource agents from GitHub.
-          - Useful on distributions where the C(resource-agents) package is missing or incomplete.
+          - Where the OCF resource agents come from.
+          - C(upstream) includes C(linbit.drbd_reactor.resource_agents_upstream), which adds only the agents missing on the
+            node from GitHub and leaves agents from a distribution package in place, so it fills the gaps of a missing or
+            incomplete C(resource-agents) package.
+          - C(distro) includes C(linbit.drbd_reactor.resource_agents_distro) to install the distribution C(resource-agents) package.
+          - C(none) installs no agents, for a calling role that installs its own.
       reactor_install_scst:
         type: bool
         default: false

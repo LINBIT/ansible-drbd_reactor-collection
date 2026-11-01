@@ -26,7 +26,12 @@
 - name: Install OCF resource agents from GitHub
   ansible.builtin.include_role:
     name: linbit.drbd_reactor.resource_agents_upstream
-  when: reactor_install_resource_agents_upstream | bool
+  when: reactor_install_resource_agents == 'upstream'
+
+- name: Install OCF resource agents from the distribution package
+  ansible.builtin.include_role:
+    name: linbit.drbd_reactor.resource_agents_distro
+  when: reactor_install_resource_agents == 'distro'
 
 - name: Install SCST iSCSI target from source
   ansible.builtin.include_role:
