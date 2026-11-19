@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: MIT
+---
+bugfixes:
+  - resource_agents_upstream - with an empty ``resource_agents_upstream_version``, the role failed
+    with HTTP 403 "rate limit exceeded" when the GitHub API's limit of 60 unauthenticated requests
+    per hour, shared by every client behind the same public IP, was spent. It now reads the latest
+    release tag from the github.com releases/latest redirect, which that limit does not cover.
+  - scst_install - with an empty ``scst_install_version``, the role failed with HTTP 403 "rate
+    limit exceeded" when the GitHub API's limit of 60 unauthenticated requests per hour, shared by
+    every client behind the same public IP, was spent. It now reads the latest release tag from
+    the github.com releases/latest redirect, which that limit does not cover.

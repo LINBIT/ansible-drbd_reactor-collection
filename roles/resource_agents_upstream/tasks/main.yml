@@ -18,9 +18,34 @@
   until: _ra_gawk_install is succeeded
   retries: 3
 
+# The releases/latest redirect does not count against the GitHub API rate limit
+- name: Find the latest upstream resource-agents release
+  ansible.builtin.uri:
+    url: "{{ _ra_github_latest }}"
+    method: HEAD
+  when: resource_agents_upstream_version | length == 0
+  register: _ra_latest_release
+  until: _ra_latest_release is succeeded
+  retries: 3
+  delay: 10
+  delegate_to: localhost
+  become: false
+  run_once: true # noqa: run-once[task]
+  check_mode: false
+
 - name: Resolve upstream resource-agents version on the control node
   ansible.builtin.set_fact:
     _ra_resolved_version: "{{ _ra_version }}"
+  run_once: true # noqa: run-once[task]
+
+- name: Assert the latest release redirect named a release tag
+  ansible.builtin.assert:
+    that: _ra_resolved_version is match('^[A-Za-z0-9._-]+$')
+    fail_msg: >-
+      {{ _ra_github_latest }} redirected to {{ _ra_latest_release.url }}, not to a
+      release tag. Set resource_agents_upstream_version to a release tag (for example v4.18.0).
+    quiet: true
+  when: resource_agents_upstream_version | length == 0
   run_once: true # noqa: run-once[task]
 
 - name: Check resource agent version markers

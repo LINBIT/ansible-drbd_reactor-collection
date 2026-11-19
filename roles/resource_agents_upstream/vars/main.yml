@@ -10,7 +10,7 @@ _ra_base_dir: >-
 
 _ra_github_repo: ClusterLabs/resource-agents
 _ra_github_raw_base: "https://raw.githubusercontent.com/{{ _ra_github_repo }}"
-_ra_github_api: "https://api.github.com/repos/{{ _ra_github_repo }}/releases/latest"
+_ra_github_latest: "https://github.com/{{ _ra_github_repo }}/releases/latest"
 _ra_marker: Managed by linbit.drbd_reactor.resource_agents_upstream
 
 # Control node download cache to reduce fetching frequency from GitHub
@@ -19,8 +19,7 @@ _ra_control_cache: /tmp/linbit-resource-agents
 _ra_version: >-
   {{ resource_agents_upstream_version
      if resource_agents_upstream_version | length > 0
-     else (lookup('ansible.builtin.url', _ra_github_api, split_lines=false)
-           | from_json).tag_name }}
+     else _ra_latest_release.url | regex_replace('^.*/releases/tag/', '') }}
 
 # Release tags (vX.Y.Z) and commit SHAs are immutable - anything else (master,
 # main) is a moving ref, so marker-matched files still get refreshed every run

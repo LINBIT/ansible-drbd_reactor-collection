@@ -24,15 +24,43 @@
          | default(ansible_play_hosts | first) }}
   run_once: true  # noqa: run-once[task]
 
+# The releases/latest redirect does not count against the GitHub API rate limit
+- name: Find the latest SCST release
+  ansible.builtin.uri:
+    url: "{{ scst_install_github_latest }}"
+    method: HEAD
+  when:
+    - _scst_any_needed | bool
+    - scst_install_version | length == 0
+  register: _scst_latest_release
+  until: _scst_latest_release is succeeded
+  retries: 3
+  delay: 10
+  delegate_to: localhost
+  become: false
+  run_once: true  # noqa: run-once[task]
+  check_mode: false
+
 - name: Resolve SCST version on the control node
   ansible.builtin.set_fact:
     _scst_resolved_version: >-
       {{ scst_install_version
          if scst_install_version | length > 0
-         else (lookup('ansible.builtin.url', scst_install_github_api, split_lines=false)
-             | from_json).tag_name }}
-  run_once: true  # noqa: run-once[task]
+         else _scst_latest_release.url | regex_replace('^.*/releases/tag/', '') }}
   when: _scst_any_needed | bool
+  run_once: true  # noqa: run-once[task]
+
+- name: Assert the latest SCST release redirect named a release tag
+  ansible.builtin.assert:
+    that: _scst_resolved_version is match('^[A-Za-z0-9._-]+$')
+    fail_msg: >-
+      {{ scst_install_github_latest }} redirected to {{ _scst_latest_release.url }}, not to a
+      release tag. Set scst_install_version to a release tag, branch, or commit SHA.
+    quiet: true
+  when:
+    - _scst_any_needed | bool
+    - scst_install_version | length == 0
+  run_once: true  # noqa: run-once[task]
 
 - name: Build SCST with a master branch fallback
   block:

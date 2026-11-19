@@ -4,4 +4,4 @@
 scst_install_cache: /tmp/linbit-scst
 
 scst_install_github_repo: SCST-project/scst
-scst_install_github_api: "https://api.github.com/repos/{{ scst_install_github_repo }}/releases/latest"
+scst_install_github_latest: "https://github.com/{{ scst_install_github_repo }}/releases/latest"
