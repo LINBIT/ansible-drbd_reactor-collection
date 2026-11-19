@@ -17,9 +17,20 @@ _ra_marker: Managed by linbit.drbd_reactor.resource_agents_upstream
 _ra_control_cache: /tmp/linbit-resource-agents
 
 _ra_version: >-
-  {{ resource_agents_upstream_version
-     if resource_agents_upstream_version | length > 0
-     else _ra_latest_release.url | regex_replace('^.*/releases/tag/', '') }}
+  {%- if resource_agents_upstream_offline_tarball | length > 0 -%}
+    {{ _ra_tarball_version }}
+  {%- elif resource_agents_upstream_version | length > 0 -%}
+    {{ resource_agents_upstream_version }}
+  {%- else -%}
+    {{ _ra_latest_release.url | regex_replace('^.*/releases/tag/', '') }}
+  {%- endif -%}
+
+# GitHub names the top directory of a tag's tarball without the tag's leading v
+_ra_tarball_ref: >-
+  {{ _ra_tarball_list.stdout_lines | first
+     | regex_replace('/.*$', '') | regex_replace('^resource-agents-', '') }}
+_ra_tarball_version: >-
+  {{ 'v' ~ _ra_tarball_ref if _ra_tarball_ref is match('[0-9]+[.][0-9]') else _ra_tarball_ref }}
 
 # Release tags (vX.Y.Z) and commit SHAs are immutable - anything else (master,
 # main) is a moving ref, so marker-matched files still get refreshed every run

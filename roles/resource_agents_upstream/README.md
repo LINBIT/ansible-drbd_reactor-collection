@@ -7,7 +7,7 @@ Install OCF resource agents from [`ClusterLabs/resource-agents`](https://github.
 - This role trades the cost of [compiling helper binaries](#c-helper-binaries) to avoid downsides with OS-packaged resource agents (missing select resource agents, older versions, etc).
 - It works consistently across all supported distributions without the need for extra distribution-specific HA repositories (Red Hat family distributions).
 - It also avoids pulling in extraneous Pacemaker packages (not needed for DRBD Reactor managed services).
-- The control node is the only host that fetches content from GitHub.
+- The control node is the only host that fetches content from GitHub, or unpacks an [offline tarball](#offline-install) instead.
 - Resource agents, OCF shell library files, and C helper sources are saved to `/tmp/linbit-resource-agents/<version>/`, then distributed to target nodes.
 - This avoids GitHub rate limiting in larger clusters.
 - C helper binaries are compiled on each node to match its architecture and C library.
@@ -49,6 +49,21 @@ Which helpers are compiled depends on the contents of `resource_agents_upstream_
 The role installs `gcc` and compiles helpers only when an agent in `resource_agents_upstream_list` needs one (currently only `IPaddr2` or `portblock`).
 When an agent that uses a helper is updated, the binary is also checked and recompiled if needed.
 
+## Offline install
+
+To install without reaching GitHub, set `resource_agents_upstream_offline_tarball` to the source tarball of a release on the control node.
+The role unpacks the tarball on the control node, therefore bypassing any requests to GitHub.
+GitHub serves the tarball for each release tag, for example [`v4.18.0.tar.gz`](https://github.com/ClusterLabs/resource-agents/archive/refs/tags/v4.18.0.tar.gz), which downloads as `resource-agents-4.18.0.tar.gz`.
+The role reads the version from the directory inside the tarball, so `resource-agents-4.18.0/` installs as `v4.18.0`, and ignores `resource_agents_upstream_version`:
+
+```yaml
+    - name: Install OCF resource agents from a release tarball
+      ansible.builtin.import_role:
+        name: linbit.drbd_reactor.resource_agents_upstream
+      vars:
+        resource_agents_upstream_offline_tarball: "{{ playbook_dir }}/files/resource-agents-4.18.0.tar.gz"
+```
+
 ## Requirements
 
 None.
@@ -58,6 +73,7 @@ None.
 | Variable | Default | Description |
 |---|---|---|
 | `resource_agents_upstream_version` | `""` | Empty (default) fetches the latest upstream release; pin to a GitHub release tag (for example `v4.18.0`) or a commit SHA for reproducibility, or set a branch name (for example `main`) to track unreleased agents |
+| `resource_agents_upstream_offline_tarball` | `""` | Control node path to a resource-agents release tarball to install from instead of GitHub (refer to [Offline install](#offline-install)) |
 | `resource_agents_upstream_list` | See defaults | List of OCF resource agent names to ensure are present |
 
 ### Default resource agents list

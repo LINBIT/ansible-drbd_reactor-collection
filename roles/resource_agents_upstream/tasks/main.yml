@@ -18,12 +18,36 @@
   until: _ra_gawk_install is succeeded
   retries: 3
 
+- name: List the offline resource-agents tarball
+  ansible.builtin.command:
+    argv: [tar, -tzf, "{{ resource_agents_upstream_offline_tarball }}"]
+  when: resource_agents_upstream_offline_tarball | length > 0
+  register: _ra_tarball_list
+  changed_when: false
+  delegate_to: localhost
+  become: false
+  run_once: true # noqa: run-once[task]
+  check_mode: false
+
+- name: Assert the offline tarball unpacks into a resource-agents directory
+  ansible.builtin.assert:
+    that: _ra_tarball_list.stdout_lines | first is match('resource-agents-[^/]+/')
+    fail_msg: >-
+      {{ resource_agents_upstream_offline_tarball }} does not unpack into a
+      resource-agents-<version> directory. Use the source tarball GitHub serves
+      for a release tag.
+    quiet: true
+  when: resource_agents_upstream_offline_tarball | length > 0
+  run_once: true # noqa: run-once[task]
+
 # The releases/latest redirect does not count against the GitHub API rate limit
 - name: Find the latest upstream resource-agents release
   ansible.builtin.uri:
     url: "{{ _ra_github_latest }}"
     method: HEAD
-  when: resource_agents_upstream_version | length == 0
+  when:
+    - resource_agents_upstream_offline_tarball | length == 0
+    - resource_agents_upstream_version | length == 0
   register: _ra_latest_release
   until: _ra_latest_release is succeeded
   retries: 3
@@ -45,7 +69,9 @@
       {{ _ra_github_latest }} redirected to {{ _ra_latest_release.url }}, not to a
       release tag. Set resource_agents_upstream_version to a release tag (for example v4.18.0).
     quiet: true
-  when: resource_agents_upstream_version | length == 0
+  when:
+    - resource_agents_upstream_offline_tarball | length == 0
+    - resource_agents_upstream_version | length == 0
   run_once: true # noqa: run-once[task]
 
 - name: Check resource agent version markers
@@ -143,7 +169,16 @@
 
 - name: Fetch resource agents to the control node cache
   ansible.builtin.include_tasks: fetch-agents.yml
-  when: _ra_fetch_list | length > 0 or _ra_fetch_lib | bool or _ra_fetch_helpers | length > 0
+  when:
+    - resource_agents_upstream_offline_tarball | length == 0
+    - _ra_fetch_list | length > 0 or _ra_fetch_lib | bool or _ra_fetch_helpers | length > 0
+  run_once: true # noqa: run-once[task]
+
+- name: Fill the control node cache from the offline tarball
+  ansible.builtin.include_tasks: offline-install.yml
+  when:
+    - resource_agents_upstream_offline_tarball | length > 0
+    - _ra_fetch_list | length > 0 or _ra_fetch_lib | bool or _ra_fetch_helpers | length > 0
   run_once: true # noqa: run-once[task]
 
 - name: Drop agents unavailable upstream from the per-node download list

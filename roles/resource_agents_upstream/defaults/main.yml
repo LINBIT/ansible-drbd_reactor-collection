@@ -5,6 +5,9 @@
 # GitHub release tag or branch name - empty string (default) fetches the latest release
 resource_agents_upstream_version: ""
 
+# Control node path to a resource-agents release tarball to use instead of fetching from GitHub
+resource_agents_upstream_offline_tarball: ""
+
 # List of OCF resource agents to ensure are present
 resource_agents_upstream_list:
   - portblock

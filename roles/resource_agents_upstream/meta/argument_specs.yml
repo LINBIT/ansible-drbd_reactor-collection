@@ -17,6 +17,16 @@ argument_specs:
           - Branch names are treated as moving refs, so previously installed agents
             are refreshed on every run. Tags and commit SHAs are immutable and skip
             already-current agents.
+      resource_agents_upstream_offline_tarball:
+        type: str
+        default: ""
+        description:
+          - Path on the control node to the source tarball GitHub serves for a ClusterLabs
+            resource-agents release tag, such as C(resource-agents-4.18.0.tar.gz).
+          - When set, the role installs from this tarball and makes no requests to GitHub.
+          - The role reads the version from the directory inside the tarball, so
+            C(resource-agents-4.18.0/) installs as C(v4.18.0).
+          - O(resource_agents_upstream_version) is ignored when this is set.
       resource_agents_upstream_list:
         type: list
         elements: str

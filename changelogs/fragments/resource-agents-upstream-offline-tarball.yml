@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: MIT
+---
+minor_changes:
+  - resource_agents_upstream - new ``resource_agents_upstream_offline_tarball`` option installs
+    the agents from a resource-agents release tarball on the control node, with no requests to
+    GitHub. The version comes from the directory inside the tarball, so
+    ``resource-agents-4.18.0/`` installs as ``v4.18.0``, and ``resource_agents_upstream_version`` is
+    ignored.

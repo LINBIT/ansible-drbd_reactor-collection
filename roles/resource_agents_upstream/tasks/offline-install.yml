@@ -1,0 +1,94 @@
+# SPDX-License-Identifier: MIT
+---
+- name: Fill the control node cache from the offline tarball
+  delegate_to: localhost
+  become: false
+  block:
+    - name: Create a temporary directory for the offline tarball
+      ansible.builtin.tempfile:
+        state: directory
+        prefix: linbit-resource-agents-
+      register: _ra_tarball_dir
+      changed_when: false
+      check_mode: false
+
+    # unarchive needs GNU tar, which macOS control nodes lack
+    - name: Unpack the offline resource-agents tarball
+      ansible.builtin.command:
+        argv: [tar, -xzf, "{{ resource_agents_upstream_offline_tarball }}", -C, "{{ _ra_tarball_dir.path }}", --strip-components=1]
+      changed_when: false
+      check_mode: false
+
+    - name: Check which requested resource agents the offline tarball contains
+      ansible.builtin.stat:
+        path: >-
+          {{ _ra_tarball_dir.path }}/heartbeat/{{ item }}{{ '.in'
+             if item in _ra_templates else '' }}
+      loop: "{{ _ra_fetch_list }}"
+      register: _ra_tarball_agents
+
+    - name: Build list of agents missing from the offline tarball
+      ansible.builtin.set_fact:
+        _ra_unavailable: >-
+          {{ _ra_tarball_agents.results
+             | rejectattr('stat.exists')
+             | map(attribute='item') | list }}
+
+    - name: Warn about skipped resource agents
+      ansible.builtin.debug:
+        msg: >-
+          Skipping {{ _ra_unavailable | join(', ') }}: not present in
+          {{ resource_agents_upstream_offline_tarball }}.
+      when: _ra_unavailable | length > 0
+
+    - name: Create control node cache directories
+      ansible.builtin.file:
+        path: "{{ _ra_control_cache }}/{{ _ra_resolved_version }}/{{ item }}"
+        state: directory
+        mode: "0755"
+      loop:
+        - heartbeat
+        - include
+        - lib
+        - tools
+
+    - name: Copy resource agents from the offline tarball to the control node cache
+      ansible.builtin.copy:
+        src: >-
+          {{ _ra_tarball_dir.path }}/heartbeat/{{ item }}{{ '.in'
+             if item in _ra_templates else '' }}
+        dest: "{{ _ra_control_cache }}/{{ _ra_resolved_version }}/heartbeat/{{ item }}"
+        mode: "0644"
+      loop: "{{ _ra_fetch_list | difference(_ra_unavailable) }}"
+
+    - name: Copy OCF shell library template files from the offline tarball to the control node cache
+      ansible.builtin.copy:
+        src: "{{ _ra_tarball_dir.path }}/heartbeat/{{ item }}.in"
+        dest: "{{ _ra_control_cache }}/{{ _ra_resolved_version }}/lib/{{ item }}"
+        mode: "0644"
+      when: _ra_fetch_lib | bool
+      loop: "{{ _ra_lib_templates }}"
+
+    - name: Copy OCF shell library plain files from the offline tarball to the control node cache
+      ansible.builtin.copy:
+        src: "{{ _ra_tarball_dir.path }}/heartbeat/{{ item }}"
+        dest: "{{ _ra_control_cache }}/{{ _ra_resolved_version }}/lib/{{ item }}"
+        mode: "0644"
+      when: _ra_fetch_lib | bool
+      loop: "{{ _ra_lib_plain }}"
+
+    - name: Copy C helper sources from the offline tarball to the control node cache
+      ansible.builtin.copy:
+        src: "{{ _ra_tarball_dir.path }}/{{ item }}"
+        dest: "{{ _ra_control_cache }}/{{ _ra_resolved_version }}/{{ item }}"
+        mode: "0644"
+      loop: "{{ _ra_fetch_helpers | map('extract', _ra_helper_sources) | flatten | unique }}"
+
+  always:
+    - name: Remove the unpacked offline tarball
+      ansible.builtin.file:
+        path: "{{ _ra_tarball_dir.path }}"
+        state: absent
+      when: _ra_tarball_dir.path is defined
+      changed_when: false
+      check_mode: false
